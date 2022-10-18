@@ -11,11 +11,11 @@ public class Database {
     private static final String URL = "jdbc:postgresql://bronto.ewi.utwente.nl/";
     private static final String USER = "dab_pcsdb20211a_57";
     private static final String PASSWORD = "JybJIj/xE116RuOZ";
-    private static final String SCHEMA = "?currentSchema=home_helper";
+    private static final String SCHEMA = "?currentSchema=safe_home";
     private static final Connection connection = connectToDB();
-    private static final String GET_USER = "SELECT to_jsonb(data) FROM (SELECT u.email, u.hashed_password, u.salt FROM home_helper.users u WHERE u.email = ?) as data;";
+    private static final String GET_USER = "SELECT to_jsonb(data) FROM (SELECT u.email, u.hashed_password, u.salt FROM safe_home.users u WHERE u.email = ?) as data;";
     private static final String INSERT_USER = "INSERT INTO users (email, hashed_password, salt) " + "VALUES (?, ?, ?) ;";
-    private static final String CREATE = "CREATE SCHEMA IF NOT EXISTS safe_home; SET search_path = home_helper;\n"
+    private static final String CREATE = "CREATE SCHEMA IF NOT EXISTS safe_home; SET search_path = safe_home;\n"
             + "CREATE TABLE IF NOT EXISTS users (tid SERIAL PRIMARY KEY,"
             + "email TEXT NOT NULL UNIQUE, hashed_password VARCHAR NOT NULL, salt  VARCHAR);";
 
@@ -25,7 +25,7 @@ public class Database {
      */
     public static Connection connectToDB() {
         try {
-//            Class.forName("org.postgresql.Driver");
+            Class.forName("org.postgresql.Driver");
             Connection ret = DriverManager.getConnection(URL + USER + SCHEMA, USER, PASSWORD);
 
             // Make sure we have the tables ready
@@ -36,7 +36,7 @@ public class Database {
             System.out.println("Database connection succeeded!");
 
             return ret;
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Failed to connect to database: " + e.getMessage());
             return null;
         }
