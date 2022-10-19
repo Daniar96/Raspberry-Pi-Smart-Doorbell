@@ -1,0 +1,19 @@
+img {
+    display: block;
+    width: 93px;
+    height: 74px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+#safe_home{
+    padding-top: 15px;
+}
+#text1{
+    padding-top: 15%;
+    padding-bottom:4%;
+}
+
+.table-bordered{
+    border: 5px solid white;
+}
