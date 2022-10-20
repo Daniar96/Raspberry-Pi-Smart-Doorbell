@@ -10,8 +10,10 @@ img {
     padding-top: 15px;
 }
 #text1{
-    padding-top: 15%;
+    padding-top:3%;
     padding-bottom:4%;
+    text-align: center;
+    font-size: 50px;
 }
 
 .table-bordered{
