@@ -8,6 +8,11 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 public class SecurityFunctions {
 
+    public static String PROVIDER ="SUN";
+    public static String SECURE_RANDOM_ALGORITHM = "SHA1PRNG";
+    public static String HASH_FUNCTION = "SHA-256";
+
+
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
         byte[] data = new byte[len / 2];
@@ -19,8 +24,8 @@ public class SecurityFunctions {
 
     public static byte[][] hashSaltFromPassword(String passwordString) {
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            SecureRandom srd = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            MessageDigest messageDigest = MessageDigest.getInstance(HASH_FUNCTION);
+            SecureRandom srd = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, PROVIDER);
             // Create random salt
             byte[] salt = new byte[20];
             srd.nextBytes(salt);
@@ -57,14 +62,14 @@ public class SecurityFunctions {
     public static boolean passwordsEqual(String plainPassword, String saltHexStr, String hashPswrdHexStr) {
 
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            MessageDigest messageDigest = MessageDigest.getInstance(HASH_FUNCTION);
             // Digest salt and plain password
             messageDigest.update(
                     (plainPassword + new String(hexStringToByteArray(saltHexStr))).getBytes(StandardCharsets.UTF_8));
             // Arrays with 2 passwords (from database, from user)
             byte[] hashedPasswordTocheck = messageDigest.digest();
-            byte[] hashedPasswordStrored = hexStringToByteArray(hashPswrdHexStr);
-            return Arrays.equals(hashedPasswordTocheck, hashedPasswordStrored);
+            byte[] hashedPasswordStored = hexStringToByteArray(hashPswrdHexStr);
+            return Arrays.equals(hashedPasswordTocheck, hashedPasswordStored);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return false;

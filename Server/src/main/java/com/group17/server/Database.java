@@ -14,10 +14,13 @@ public class Database {
     private static final String SCHEMA = "?currentSchema=safe_home";
     private static final Connection connection = connectToDB();
     private static final String GET_USER = "SELECT to_jsonb(data) FROM (SELECT u.email, u.hashed_password, u.salt FROM safe_home.users u WHERE u.email = ?) as data;";
+    private static final String GET_USER_LIST = "SELECT u.email FROM safe_home.users u;";
     private static final String INSERT_USER = "INSERT INTO users (email, hashed_password, salt) " + "VALUES (?, ?, ?) ;";
     private static final String CREATE = "CREATE SCHEMA IF NOT EXISTS safe_home; SET search_path = safe_home;\n"
-            + "CREATE TABLE IF NOT EXISTS users (tid SERIAL PRIMARY KEY,"
-            + "email TEXT NOT NULL UNIQUE, hashed_password VARCHAR NOT NULL, salt  VARCHAR);";
+            + "CREATE TABLE IF NOT EXISTS users (pid SERIAL PRIMARY KEY,"
+            + "email TEXT NOT NULL UNIQUE, is_online boolean, hashed_password VARCHAR NOT NULL, salt  VARCHAR);"
+            + "CREATE TABLE IF NOT EXISTS rfid (rfid VARCHAR NOT NULL, pid integer REFERENCES users (pid) ON DELETE CASCADE," +
+            "PRIMARY KEY (rfid, pid));";
 
 
     /**
@@ -44,9 +47,10 @@ public class Database {
 
     /**
      * Registers a new user in a database
-     * @param email - user's email
+     *
+     * @param email    - user's email
      * @param password - user's password
-     * @param salt - random salt
+     * @param salt     - random salt
      * @throws SQLException - SQL error
      */
     public static void updateUser(String email, byte[] password, byte[] salt) throws SQLException {
@@ -60,6 +64,7 @@ public class Database {
 
     /**
      * Gets a user from a database
+     *
      * @param userName - username of a searched user
      * @return - Json object in String with username, hashed password and salt
      * @throws SQLException - sql error
@@ -75,6 +80,20 @@ public class Database {
             }
         }
     }
+
+    //TODO
+    public static String getUserList() throws SQLException {
+        try (PreparedStatement pr = connection.prepareStatement(GET_USER_LIST)) {
+            ResultSet fin = pr.executeQuery();
+            StringBuilder res = new StringBuilder();
+            while (fin.next()) {
+                res.append(fin.getString(1)).append(", ");
+            }
+            res.setLength(res.length() - 2);
+            return res.toString();
+        }
+    }
+
     public static boolean checkUser(String userName, String plainPassword) throws SQLException {
         try {
 
