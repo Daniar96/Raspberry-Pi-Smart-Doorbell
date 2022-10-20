@@ -15,12 +15,12 @@ public class Database {
     private static final Connection connection = connectToDB();
     private static final String GET_USER = "SELECT to_jsonb(data) FROM (SELECT u.email, u.hashed_password, u.salt FROM safe_home.users u WHERE u.email = ?) as data;";
     private static final String GET_USER_LIST = "SELECT u.email FROM safe_home.users u;";
-    private static final String INSERT_USER = "INSERT INTO users (email, hashed_password, salt) " + "VALUES (?, ?, ?) ;";
+    private static final String INSERT_USER = "INSERT INTO users (email, is_online, hashed_password, salt) " + "VALUES (?,?, ?, ?) ;";
+
+    private static final String SET_RFID = "UPDATE users SET rfid = ? WHERE email = ?;";
     private static final String CREATE = "CREATE SCHEMA IF NOT EXISTS safe_home; SET search_path = safe_home;\n"
             + "CREATE TABLE IF NOT EXISTS users (pid SERIAL PRIMARY KEY,"
-            + "email TEXT NOT NULL UNIQUE, is_online boolean, hashed_password VARCHAR NOT NULL, salt  VARCHAR);"
-            + "CREATE TABLE IF NOT EXISTS rfid (rfid VARCHAR NOT NULL, pid integer REFERENCES users (pid) ON DELETE CASCADE," +
-            "PRIMARY KEY (rfid, pid));";
+            + "email TEXT NOT NULL UNIQUE, is_online boolean, hashed_password VARCHAR NOT NULL, salt  VARCHAR, rfid VARCHAR);";
 
 
     /**
@@ -45,6 +45,13 @@ public class Database {
         }
     }
 
+    public static void setRFID(String rfid, String user) throws SQLException {
+        PreparedStatement pr = connection.prepareStatement(SET_RFID);
+        pr.setString(1, rfid);
+        pr.setString(2, user);
+        pr.executeUpdate();
+    }
+
     /**
      * Registers a new user in a database
      *
@@ -54,12 +61,13 @@ public class Database {
      * @throws SQLException - SQL error
      */
     public static void updateUser(String email, byte[] password, byte[] salt) throws SQLException {
-        try (PreparedStatement pr = connection.prepareStatement(INSERT_USER)) {
-            pr.setString(1, email);
-            pr.setBytes(2, password);
-            pr.setBytes(3, salt);
-            pr.executeUpdate();
-        }
+        PreparedStatement pr = connection.prepareStatement(INSERT_USER);
+        pr.setString(1, email);
+        pr.setBoolean(2, true);
+        pr.setBytes(3, password);
+        pr.setBytes(4, salt);
+        pr.executeUpdate();
+
     }
 
     /**
@@ -81,7 +89,7 @@ public class Database {
         }
     }
 
-    //TODO
+    //TODO Bad code
     public static String getUserList() throws SQLException {
         try (PreparedStatement pr = connection.prepareStatement(GET_USER_LIST)) {
             ResultSet fin = pr.executeQuery();
@@ -109,6 +117,17 @@ public class Database {
             return false;
         }
 
+    }
+
+    public static boolean checkOnline(String id) {
+        try(PreparedStatement pr = connection.prepareStatement("UPDATE users SET is_online=NOT is_online WHERE rfid=?")){
+            pr.setString(1, id);
+            int res = pr.executeUpdate();
+            return res > 0;
+        } catch (SQLException e) {
+            System.out.println("a");
+        }
+        return false;
     }
 
     public static boolean registerUser(String userName, String passwordString) throws SQLException {
