@@ -5,11 +5,8 @@ import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
-
-import java.io.IOException;
 
 @SecurityCheck
 @Provider
@@ -17,45 +14,38 @@ import java.io.IOException;
 public class LoginFilter implements ContainerRequestFilter {
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
 
-        // Get the Authorization header from the request
-        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+            String authorizationHeader;
 
-        // Validate the Authorization header
-        if (!isValidToken(authorizationHeader)) {
-            System.out.println("Header is invalid");
-            abortWithUnauthorized(requestContext);
-            return;
-        }
+            try {
+                authorizationHeader = requestContext.getCookies().get("SESSION_ID").getValue();
+            } catch (NullPointerException e) {
+                abortWithUnauthorized(requestContext, "Token was not provided");
+                return;
+            }
 
-        try {
             // Validate the token
-            validateToken(authorizationHeader);
+            if (!validToken(authorizationHeader))
+                abortWithUnauthorized(requestContext, "Couldn't authenticate the user, please log in again");
 
-        } catch (Exception e) {
-            abortWithUnauthorized(requestContext);
-        }
     }
 
-    private boolean isValidToken(String authorizationHeader) {
-        // Check if a header is valid (not null)
-        return authorizationHeader != null;
-    }
 
-    private void abortWithUnauthorized(ContainerRequestContext requestContext) {
+    private void abortWithUnauthorized(ContainerRequestContext requestContext, String msg) {
         // Abort with 401 error and error message
         requestContext.abortWith(
-                Response.status(Response.Status.UNAUTHORIZED).entity(new ServerError("Ivalid/expired token")).build());
+                Response.status(Response.Status.UNAUTHORIZED).entity(new ServerError(msg)).build());
     }
 
-    private void validateToken(String token) throws Exception {
+    private boolean validToken(String token) {
         TokenList.print();
-        // Throw an Exception if the token is invalid
         if (!TokenList.isValidToken(token)) {
-            throw new Exception();
+            return false;
         } else {
-            System.out.println("User: " + TokenList.getUser(token) + " succesfully validated their token");
+            System.out.println("User: " + TokenList.getUser(token) + " successfully validated their token");
+            return true;
         }
     }
+
 }
