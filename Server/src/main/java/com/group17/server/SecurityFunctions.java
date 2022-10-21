@@ -6,9 +6,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+
 public class SecurityFunctions {
 
-    public static String PROVIDER ="SUN";
+    public static String PROVIDER = "SUN";
     public static String SECURE_RANDOM_ALGORITHM = "SHA1PRNG";
     public static String HASH_FUNCTION = "SHA-256";
 
@@ -78,11 +79,16 @@ public class SecurityFunctions {
         }
 
     }
+
     public static String getRandomString() {
+        return getRandomString(50);
+    }
+
+    public static String getRandomString(int charsNumber) {
         try {
             StringBuilder sb = new StringBuilder();
             SecureRandom srd = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, PROVIDER);
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < charsNumber; i++) {
                 sb.append(CHARS_ARRAY[srd.nextInt(CHARS_ARRAY.length)]);
             }
             return sb.toString();

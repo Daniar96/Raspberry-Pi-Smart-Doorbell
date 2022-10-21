@@ -15,7 +15,7 @@ class SecurityTest {
 
     @BeforeEach
     void init() {
-        plainPassword = getRandomString();
+        plainPassword = getRandomString(10);
     }
 
     @Test
@@ -42,7 +42,9 @@ class SecurityTest {
         Assertions.assertFalse(hasDuplicate(passwords));
     }
 
-    boolean hasDuplicate(String[] array) {
+
+
+    private boolean hasDuplicate(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
                 if ((array[i].equals(array[j])) && (i != j)) {

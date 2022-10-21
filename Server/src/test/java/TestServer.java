@@ -50,5 +50,35 @@ public class TestServer {
 
     }
 
+    @Test
+    public void testRegisterFailure() throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost post = new HttpPost("http://localhost:8080/Server_war/api/login");
+
+        post.setHeader("Content-type", "application/json");
+        post.setHeader("Accept", "application/json");
+
+        username = getRandomString();
+        pass = getRandomString();
+
+
+
+
+        String inputJson = "{\n" +
+                "  \"username\": \"" + username + "\",\n" +
+                "  \"password\": \"" + pass + "\"\n" +
+                "}";
+
+        StringEntity stringEntity = new StringEntity(inputJson);
+
+        post.setEntity(stringEntity);
+
+        HttpResponse response = client.execute(post);
+
+        String rsp = EntityUtils.toString(response.getEntity());
+        assertEquals(403, response.getStatusLine().getStatusCode());
+
+    }
+
 
 }
