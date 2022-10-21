@@ -56,10 +56,24 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="row">
-                                        <h6>Smoke Sensor</h6>
+                                        <h6>Smoke Detected</h6>
                                     </div>
                                     <div class="row">
-                                        <p>On</p>
+                                        <p id="smoke-detected"></p>
+                                        <script>
+                                            $.ajax({
+                                                url: `http://localhost:8080/Server_war/api/RPI/smokeAlert`,
+                                                type: "GET",
+                                                async: true,
+                                                success: function (number) {
+                                                    if (number === 0) {
+                                                        document.getElementById("smoke-detected").innerHTML = "No"
+                                                    } else {
+                                                        document.getElementById("smoke-detected").innerHTML = "Yes"
+                                                    }
+                                                }
+                                            });
+                                        </script>
                                     </div>
                                 </div>
 
@@ -72,10 +86,10 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="row">
-                                        <h6>Flame Sensor</h6>
+                                        <h6>Flame Detected</h6>
                                     </div>
                                     <div class="row">
-                                        <p>On</p>
+                                        <p>No</p>
                                     </div>
                                 </div>
                             </div>
