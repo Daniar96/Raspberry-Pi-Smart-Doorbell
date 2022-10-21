@@ -1,8 +1,11 @@
 package com.group17.server;
 
 import com.group17.JSONObjects.HashedUserCredentials;
+import com.group17.JSONObjects.UserCredentials;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.group17.server.SecurityFunctions.hashSaltFromPassword;
 import static com.group17.server.SecurityFunctions.passwordsEqual;
@@ -99,6 +102,20 @@ public class Database {
             }
             res.setLength(res.length() - 2);
             return res.toString();
+        }
+    }
+    public static List<UserCredentials> getUsersList() {
+        List <UserCredentials> users = new ArrayList<>();
+        try (ResultSet resultSet = connection.createStatement().executeQuery("Select email, is_online FROM users")) {
+            while (resultSet.next()) {
+                String email = resultSet.getString("email");
+                boolean online = resultSet.getBoolean("is_online");
+                UserCredentials user = new UserCredentials(email, online);
+                users.add(user);
+            }
+            return users;
+        }catch (SQLException e){
+            return null;
         }
     }
 
