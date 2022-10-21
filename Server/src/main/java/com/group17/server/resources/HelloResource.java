@@ -18,7 +18,7 @@ import java.sql.SQLException;
 @Path("/test")
 public class HelloResource {
     @Path("/hello")
-    @SecurityCheck
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String hello() {

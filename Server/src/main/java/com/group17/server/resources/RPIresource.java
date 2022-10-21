@@ -29,7 +29,7 @@ public class RPIresource {
     @Path("smokeAlert")
     @Produces(MediaType.APPLICATION_JSON)
     public Response smokeAlertWeb(){
-        return Response.status(200).entity(1).build();
+        return Response.status(200).entity(smoke).build();
     }
 
     @POST
@@ -37,6 +37,7 @@ public class RPIresource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response checkTag(TagID id){
+        Database database = new Database();
         if (Database.checkOnline(id.getTagID())){
             return Response.status(200).build();
         }else {
