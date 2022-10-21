@@ -1,10 +1,9 @@
 package com.group17.JSONObjects;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
+
+import static com.group17.server.SecurityFunctions.getRandomString;
 
 public class Username_Token {
-    private static final char[] CHARS_ARRAY = "abcdefghijklmnopqrstuvwxyz1234567890".toCharArray();
+
     String username;
     String token;
 
@@ -26,7 +25,7 @@ public class Username_Token {
 
     public Username_Token(String username) {
         this.username = username;
-        this.token = getRandomToken();
+        this.token = getRandomString();
     }
 
     public Username_Token(String username, String token) {
@@ -34,26 +33,9 @@ public class Username_Token {
         this.token = token;
     }
 
-    private static String getRandomToken() {
-        try {
-            StringBuilder sb = new StringBuilder();
-            SecureRandom srd = SecureRandom.getInstance("SHA1PRNG", "SUN");
-            for (int i = 0; i < 50; i++) {
-                sb.append(CHARS_ARRAY[srd.nextInt(CHARS_ARRAY.length)]);
-            }
-            return sb.toString();
 
-            // byte[] token = new byte[20];
-            // srd.nextBytes(token);
-            // return new String(token);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
     public void resetToken() {
-        this.token = getRandomToken();
+        this.token = getRandomString();
     }
 
 }

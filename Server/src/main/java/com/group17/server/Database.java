@@ -49,6 +49,7 @@ public class Database {
     }
 
     public static void setRFID(String rfid, String user) throws SQLException {
+        connectToDB();
         PreparedStatement pr = connection.prepareStatement(SET_RFID);
         pr.setString(1, rfid);
         pr.setString(2, user);
@@ -64,6 +65,7 @@ public class Database {
      * @throws SQLException - SQL error
      */
     public static void updateUser(String email, byte[] password, byte[] salt) throws SQLException {
+        connectToDB();
         PreparedStatement pr = connection.prepareStatement(INSERT_USER);
         pr.setString(1, email);
         pr.setBoolean(2, true);
@@ -81,6 +83,7 @@ public class Database {
      * @throws SQLException - sql error
      */
     public static String getUser(String userName) throws SQLException {
+        connectToDB();
         try (PreparedStatement pr = connection.prepareStatement(GET_USER)) {
             pr.setString(1, userName);
             ResultSet fin = pr.executeQuery();
@@ -94,6 +97,7 @@ public class Database {
 
     //TODO Bad code
     public static String getUserList() throws SQLException {
+        connectToDB();
         try (PreparedStatement pr = connection.prepareStatement(GET_USER_LIST)) {
             ResultSet fin = pr.executeQuery();
             StringBuilder res = new StringBuilder();
@@ -105,6 +109,7 @@ public class Database {
         }
     }
     public static List<UserCredentials> getUsersList() {
+        connectToDB();
         List <UserCredentials> users = new ArrayList<>();
         try (ResultSet resultSet = connection.createStatement().executeQuery("Select email, is_online FROM users")) {
             while (resultSet.next()) {
@@ -120,6 +125,7 @@ public class Database {
     }
 
     public static boolean checkUser(String userName, String plainPassword) throws SQLException {
+        connectToDB();
         try {
 
             // Get JSON object with user credentials for given userName
@@ -137,6 +143,7 @@ public class Database {
     }
 
     public static boolean checkOnline(String id) {
+        connectToDB();
         try(PreparedStatement pr = connection.prepareStatement("UPDATE users SET is_online=NOT is_online WHERE rfid=?")){
             pr.setString(1, id);
             int res = pr.executeUpdate();
@@ -148,6 +155,7 @@ public class Database {
     }
 
     public static boolean registerUser(String userName, String passwordString) throws SQLException {
+        connectToDB();
         // Check if a user is in a database
         String user = getUser(userName);
         if (!user.equals("{}")) {

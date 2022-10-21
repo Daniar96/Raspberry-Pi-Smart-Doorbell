@@ -12,6 +12,8 @@ public class SecurityFunctions {
     public static String SECURE_RANDOM_ALGORITHM = "SHA1PRNG";
     public static String HASH_FUNCTION = "SHA-256";
 
+    private static final char[] CHARS_ARRAY = "abcdefghijklmnopqrstuvwxyz1234567890".toCharArray();
+
 
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
@@ -47,7 +49,7 @@ public class SecurityFunctions {
 
     public static byte[] hashFromPassword(String passwordString) {
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            MessageDigest messageDigest = MessageDigest.getInstance(HASH_FUNCTION);
             // Hash password and salt
             messageDigest.update(passwordString.getBytes(StandardCharsets.UTF_8));
             return messageDigest.digest();
@@ -76,4 +78,19 @@ public class SecurityFunctions {
         }
 
     }
+    public static String getRandomString() {
+        try {
+            StringBuilder sb = new StringBuilder();
+            SecureRandom srd = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, PROVIDER);
+            for (int i = 0; i < 50; i++) {
+                sb.append(CHARS_ARRAY[srd.nextInt(CHARS_ARRAY.length)]);
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 }

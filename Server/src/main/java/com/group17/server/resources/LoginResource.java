@@ -33,7 +33,7 @@ public class LoginResource {
 
             NewCookie session_id = new NewCookie("SESSION_ID", ut.getToken(), "/", "domain",
                     "JWT token", 600, true, true);
-            return Response.status(Response.Status.OK).cookie(session_id).entity(ut).build();
+            return Response.status(Response.Status.OK).cookie(session_id).header("COOKIE", "SESSION_ID=" + ut.getToken()+";").entity(ut).build();
 
 
         } catch (SQLException e) {
