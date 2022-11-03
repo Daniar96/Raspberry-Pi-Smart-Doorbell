@@ -294,6 +294,33 @@ public class Database {
         }
     }
 
+    public static void stopPir() {
+        connectToDB();
+        try {
+            connection.createStatement().executeUpdate("UPDATE pir SET working = FALSE");
+        }catch (SQLException e){
+        }
+    }
+
+    public static void startPir(){
+        connectToDB();
+        try {
+            connection.createStatement().executeUpdate("UPDATE pir SET working = TRUE");
+        }catch (SQLException e){
+        }
+    }
+
+    public static boolean getPir(){
+        connectToDB();
+        try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT working FROM pir")){
+            resultSet.next();
+            boolean k = resultSet.getBoolean(1);
+            return k;
+        }catch (SQLException e){
+            return false;
+        }
+    }
+
     public static boolean registerUser(String userName, String passwordString) throws SQLException {
         connectToDB();
         // Check if a user is in a database
