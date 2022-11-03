@@ -1,6 +1,7 @@
 package com.group17.server;
 
 import com.group17.JSONObjects.HashedUserCredentials;
+import com.group17.JSONObjects.Image;
 import com.group17.JSONObjects.UserCredentials;
 
 import java.sql.*;
@@ -108,6 +109,37 @@ public class Database {
             return res.toString();
         }
     }
+
+    public static void insertImage(String name, String encode) {
+        connectToDB();
+        try (PreparedStatement pr = connection.prepareStatement("INSERT INTO images VALUES (?, ?)")){
+            pr.setString(1, name);
+            pr.setString(2, encode);
+            pr.executeUpdate();
+        }catch (SQLException e){
+
+        }
+    }
+
+    public static List<Image> getImages(){
+        connectToDB();
+        List<Image> images = new ArrayList<>();
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT name, encode FROM images ORDER BY name DESC")){
+            while (resultSet.next()){
+                String name = resultSet.getString("name");
+                String encode = resultSet.getString("encode");
+                Image image = new Image(name, encode);
+                images.add(image);
+                if (images.size() >= 10){
+                    return images;
+                }
+            }
+            return images;
+        }catch (SQLException e){
+            return null;
+        }
+    }
+
     public static List<UserCredentials> getUsersList() {
         connectToDB();
         List <UserCredentials> users = new ArrayList<>();
@@ -152,6 +184,66 @@ public class Database {
             System.out.println("a");
         }
         return false;
+    }
+
+    public static void smokeAlert(boolean alert) {
+        connectToDB();
+        try(PreparedStatement pr = connection.prepareStatement("UPDATE smoke SET alert=?")) {
+            pr.setBoolean(1, alert);
+            pr.executeUpdate();
+        } catch (SQLException e) {
+
+        }
+    }
+
+    public static int getSmoke() {
+        connectToDB();
+        try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM smoke")){
+            boolean k = resultSet.getBoolean(1);
+            if (k)return 1; else return 0;
+        }catch (SQLException e){
+            return 0;
+        }
+    }
+
+    public static void micAlert(boolean alert) {
+        connectToDB();
+        try(PreparedStatement pr = connection.prepareStatement("UPDATE mic SET alert=?")) {
+            pr.setBoolean(1, alert);
+            pr.executeUpdate();
+        } catch (SQLException e) {
+
+        }
+    }
+
+    public static int getMic() {
+        connectToDB();
+        try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM mic")){
+            boolean k = resultSet.getBoolean(1);
+            if (k)return 1; else return 0;
+        }catch (SQLException e){
+            return 0;
+        }
+    }
+
+    public static void flameAlert(boolean alert) {
+        connectToDB();
+        try(PreparedStatement pr = connection.prepareStatement("UPDATE flame SET alert=?")) {
+            pr.setBoolean(1, alert);
+            pr.executeUpdate();
+        } catch (SQLException e) {
+
+        }
+    }
+
+    public static int getFlame() {
+        connectToDB();
+        try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM flame")){
+            boolean k = resultSet.getBoolean(1);
+            if (k)return 1; else return 0;
+        }catch (SQLException e){
+            return 0;
+        }
     }
 
     public static boolean registerUser(String userName, String passwordString) throws SQLException {
