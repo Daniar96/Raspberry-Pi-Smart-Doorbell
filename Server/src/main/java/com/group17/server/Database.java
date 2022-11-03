@@ -199,7 +199,8 @@ public class Database {
     public static int getSmoke() {
         connectToDB();
         try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM smoke")){
-            boolean k = resultSet.getBoolean(1);
+            resultSet.next();
+            boolean k = resultSet.getBoolean("alert");
             if (k)return 1; else return 0;
         }catch (SQLException e){
             return 0;
@@ -219,7 +220,8 @@ public class Database {
     public static int getMic() {
         connectToDB();
         try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM mic")){
-            boolean k = resultSet.getBoolean(1);
+            resultSet.next();
+            boolean k = resultSet.getBoolean("alert");
             if (k)return 1; else return 0;
         }catch (SQLException e){
             return 0;
@@ -239,7 +241,8 @@ public class Database {
     public static int getFlame() {
         connectToDB();
         try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM flame")){
-            boolean k = resultSet.getBoolean(1);
+            resultSet.next();
+            boolean k = resultSet.getBoolean("alert");
             if (k)return 1; else return 0;
         }catch (SQLException e){
             return 0;
