@@ -1,7 +1,10 @@
 package com.group17.server;
 
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import com.group17.JSONObjects.HashedUserCredentials;
 import com.group17.JSONObjects.Image;
+import com.group17.JSONObjects.Log;
 import com.group17.JSONObjects.UserCredentials;
 
 import java.sql.*;
@@ -130,7 +133,7 @@ public class Database {
                 String encode = resultSet.getString("encode");
                 Image image = new Image(name, encode);
                 images.add(image);
-                if (images.size() >= 10){
+                if (images.size() >= 3){
                     return images;
                 }
             }
@@ -179,9 +182,21 @@ public class Database {
         try(PreparedStatement pr = connection.prepareStatement("UPDATE users SET is_online=NOT is_online WHERE rfid=?")){
             pr.setString(1, id);
             int res = pr.executeUpdate();
+            try(PreparedStatement pr1 = connection.prepareStatement("SELECT email, is_online FROM users WHERE rfid = ?")){
+                pr1.setString(1, id);
+                ResultSet resultSet = pr1.executeQuery();
+                resultSet.next();
+                String name = resultSet.getString(1);
+                boolean k = resultSet.getBoolean(2);
+                if (k){
+                    Database.addLog("User" + name + "has entered the house.");
+                }else {
+                    Database.addLog("User" + name + "has left the house.");
+                }
+            }
             return res > 0;
         } catch (SQLException e) {
-            System.out.println("a");
+
         }
         return false;
     }
@@ -246,6 +261,36 @@ public class Database {
             if (k)return 1; else return 0;
         }catch (SQLException e){
             return 0;
+        }
+    }
+
+    public static void addLog(String log) {
+        connectToDB();
+        try (PreparedStatement pr = connection.prepareStatement("INSERT INTO logs VALUES (?, ?)")){
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            String date = dtf.format(now);
+            pr.setString(1, date);
+            pr.setString(2, log);
+            pr.executeUpdate();
+        }catch (SQLException e){
+
+        }
+    }
+
+    public static List<Log> getLogs() {
+        connectToDB();
+        List<Log> logs = new ArrayList<>();
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT date, log FROM logs ORDER BY date DESC")){
+            while (resultSet.next()){
+                String date = resultSet.getString("date");
+                String logstr = resultSet.getString("log");
+                Log log = new Log(date, logstr);
+                logs.add(log);
+            }
+            return logs;
+        }catch (SQLException e){
+            return null;
         }
     }
 

@@ -92,9 +92,9 @@ public class RPIresource {
     @Path("/image")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getImage(Image image){
+        Database.addLog("PIR sensor has detected movement");
         Database.insertImage(image.getName(), image.getEncode());
-       return Response.status(200).build();
+        return Response.status(200).build();
     }
-
 
 }
