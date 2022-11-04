@@ -113,4 +113,16 @@ public class RPIresource {
         return Response.status(200).build();
     }
 
+    @POST
+    @Path("/getPIR")
+    public Response getSensor(){
+        int i;
+        if (Database.getPir()){
+            i = 1;
+        }else {
+            i = 0;
+        }
+        return Response.status(200).entity(i).build();
+    }
+
 }
