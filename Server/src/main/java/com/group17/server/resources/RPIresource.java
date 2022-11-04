@@ -113,7 +113,7 @@ public class RPIresource {
         return Response.status(200).build();
     }
 
-    @POST
+    @GET
     @Path("/getPIR")
     public Response getSensor(){
         int i;
