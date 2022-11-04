@@ -34,12 +34,12 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col">
-                                                    <p id="alarm_status">Off</p>
+                                                    <p id="alarm_status">On</p>
                                                 </div>
                                                 <div class="col">
                                                     <div class="row pt-2">
                                                         <div class="custom-control custom-switch">
-                                                            <input type="checkbox" class="custom-control-input" id="customSwitches" onclick="onOff()">
+                                                            <input type="checkbox" class="custom-control-input" id="customSwitches" checked onclick="onOff()">
                                                             <label class="custom-control-label" for="customSwitches">Toggle Alarm</label>
                                                         </div>
                                                     </div>
@@ -163,9 +163,25 @@
                     <div class="row pt-3">
                         <h2>Last Photo Taken</h2>
                     </div>
-                    <div class="row">
-                        <img src="images/gallery-example-2.png" style="height:45vh">
-                    </div>
+                    <div class="row" id="last-image"></div>
+                    <script>
+                        $.ajax({
+                            url: `http://localhost:8080/Server_war/api/images`,
+                            type: "GET",
+                            async: false,
+                            success: function (response) {
+                                let encoding = response[0]["encode"];
+                                let image = new Image();
+                                image.src = `data:image/png;base64,${encoding}`;
+                                image.setAttribute("style", "max-height: 47vh;");
+                                image.classList.add("d-block");
+                                image.classList.add("w-100");
+
+                                let row = document.getElementById("last-image");
+                                row.appendChild(image);
+                            }
+                        });
+                    </script>
                 </div>
             </div>
         </div>
