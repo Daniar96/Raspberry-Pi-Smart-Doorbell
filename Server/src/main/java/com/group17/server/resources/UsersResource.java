@@ -5,8 +5,8 @@ import com.group17.server.Database;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
+
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
 public class UsersResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsers(){
+    public Response getUsers() {
         List<UserCredentials> users = Database.getUsersList();
         return Response.status(200).entity(users).build();
     }
