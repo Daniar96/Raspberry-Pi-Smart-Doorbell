@@ -34,16 +34,31 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col">
-                                                    <p id="alarm_status">On</p>
+                                                    <p id="alarm_status"></p>
                                                 </div>
                                                 <div class="col">
                                                     <div class="row pt-2">
                                                         <div class="custom-control custom-switch">
-                                                            <input type="checkbox" class="custom-control-input" id="customSwitches" checked onclick="onOff()">
+                                                            <input type="checkbox" class="custom-control-input" id="customSwitches" onclick="onOff()">
                                                             <label class="custom-control-label" for="customSwitches">Toggle Alarm</label>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <script>
+                                                    $.ajax({
+                                                        url: `http://localhost:8080/Server_war/api/RPI/getPIR`,
+                                                        type: "GET",
+                                                        async: false,
+                                                        success: function (number) {
+                                                            if (number === 0) {
+                                                                document.getElementById("alarm_status").innerHTML = "Off"
+                                                            } else {
+                                                                document.getElementById("alarm_status").innerHTML = "On"
+                                                                document.getElementById("customSwitches").checked;
+                                                            }
+                                                        }
+                                                    });
+                                                </script>
                                             </div>
                                         </div>
                                     </div>
