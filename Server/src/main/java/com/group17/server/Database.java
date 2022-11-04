@@ -219,9 +219,9 @@ public class Database {
                 String name = resultSet.getString(1);
                 boolean k = resultSet.getBoolean(2);
                 if (k) {
-                    Database.addLog("User" + name + " has entered the house.");
+                    Database.addLog("User " + name + " has entered the house.");
                 } else {
-                    Database.addLog("User" + name + " has left the house.");
+                    Database.addLog("User " + name + " has left the house.");
                 }
             }
             return res > 0;
