@@ -133,35 +133,43 @@
                             <img src="images/logo.png" style="height:5vh">
                         </div>
                     </div>
-                    <div class="row">
-                        <h2>History</h2>
-                    </div>
+                    <br>
                     <div class="row p-2">
-                        <div class="col-8">
-                            <div class="row" style="border: 1px solid black">
-                                <p>Smoke sensor activated</p>
-                            </div>
-                            <div class="row" style="border: 1px solid black">
-                                <p>Bogdan entered the house</p>
-                            </div>
-                            <div class="row" style="border: 1px solid black">
-                                <p>Temperature is 16 °C</p>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="row" style="border: 1px solid black">
-                                <p>17:00 05/10/2022</p>
-                            </div>
-                            <div class="row" style="border: 1px solid black">
-                                <p>15:00 05/10/2022</p>
-                            </div>
-                            <div class="row" style="border: 1px solid black">
-                                <p>08:00 05/10/2022</p>
-                            </div>
-                        </div>
+                        <table class="table table-bordered align-middle mb-0 bg-white">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Notification</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
+
+                    <script>
+                        $.ajax({
+                            url: `http://localhost:8080/Server_war/api/logs`,
+                            type: "GET",
+                            async: false,
+                            success: function (response) {
+                                let tbody = document.getElementsByTagName("tbody")[0];
+                                for (let index in ["0", "1", "2"]) {
+                                    let td1 = document.createElement("td");
+                                    td1.innerHTML = response[index]["log"];
+
+                                    let td2 = document.createElement("td");
+                                    td2.innerHTML = response[index]["date"]
+
+                                    let tr = document.createElement("tr");
+                                    tr.appendChild(td1);
+                                    tr.appendChild(td2);
+                                    tbody.appendChild(tr);
+                                }
+                            }
+                        });
+                    </script>
                     <div class="row pt-3">
-                        <h2>Last Photo Taken</h2>
+                        <h5>Last Photo Taken</h5>
                     </div>
                     <div class="row" id="last-image"></div>
                     <script>
