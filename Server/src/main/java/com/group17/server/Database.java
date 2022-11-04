@@ -133,7 +133,7 @@ public class Database {
                 String encode = resultSet.getString("encode");
                 Image image = new Image(name, encode);
                 images.add(image);
-                if (images.size() >= 3){
+                if (images.size() >= 5){
                     return images;
                 }
             }
