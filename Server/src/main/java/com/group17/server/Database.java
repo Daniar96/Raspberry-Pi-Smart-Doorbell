@@ -2,10 +2,8 @@ package com.group17.server;
 
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
-import com.group17.JSONObjects.HashedUserCredentials;
-import com.group17.JSONObjects.Image;
-import com.group17.JSONObjects.Log;
-import com.group17.JSONObjects.UserCredentials;
+
+import com.group17.JSONObjects.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,13 +19,15 @@ public class Database {
     private static final String SCHEMA = "?currentSchema=safe_home";
     private static final Connection connection = connectToDB();
     private static final String GET_USER = "SELECT to_jsonb(data) FROM (SELECT u.email, u.hashed_password, u.salt FROM safe_home.users u WHERE u.email = ?) as data;";
-    private static final String GET_USER_LIST = "SELECT u.email FROM safe_home.users u;";
+    private static final String GET_USER_INFO = "SELECT to_jsonb(data) FROM (SELECT u.username, u.full_name FROM safe_home.users u WHERE u.email = ?) as data;";
+    private static final String GET_USER_LIST = "SELECT to_jsonb(data) FROM (SELECT u.email, u.username,u.full_name FROM safe_home.users u) as data;";
     private static final String INSERT_USER = "INSERT INTO users (email, is_online, hashed_password, salt) " + "VALUES (?,?, ?, ?) ;";
 
     private static final String SET_RFID = "UPDATE users SET rfid = ? WHERE email = ?;";
+    private static final String SET_USER_INFO = "UPDATE users SET full_name = ?, username = ?, hashed_password = ?, salt = ? WHERE email = ?;";
     private static final String CREATE = "CREATE SCHEMA IF NOT EXISTS safe_home; SET search_path = safe_home;\n"
-            + "CREATE TABLE IF NOT EXISTS users (pid SERIAL PRIMARY KEY,"
-            + "email TEXT NOT NULL UNIQUE, is_online boolean, hashed_password VARCHAR NOT NULL, salt  VARCHAR, rfid VARCHAR);";
+            + "CREATE TABLE IF NOT EXISTS users (email TEXT PRIMARY KEY, username TEXT, full_name TEXT," +
+            " is_online boolean, hashed_password VARCHAR NOT NULL, salt  VARCHAR, rfid VARCHAR);";
 
 
     /**
@@ -52,6 +52,36 @@ public class Database {
         }
     }
 
+    public static UserInfo getUserInfo(String email) throws SQLException {
+        connectToDB();
+        try (PreparedStatement pr = connection.prepareStatement(GET_USER_INFO)) {
+            pr.setString(1, email);
+            ResultSet fin = pr.executeQuery();
+            if (fin.next()) {
+                return new UserInfo(fin.getString(1));
+            } else {
+                return null;
+            }
+        }
+
+    }
+
+    public static void setUserInfo(String email, UserInfo userInfo) throws SQLException{
+        connectToDB();
+        byte[][] hashWithSalt = hashSaltFromPassword(userInfo.getPassword());
+        assert hashWithSalt != null;
+        PreparedStatement pr = connection.prepareStatement(SET_USER_INFO);
+
+        pr.setString(1, userInfo.getFull_name());
+        pr.setString(2, userInfo.getUsername());
+        pr.setBytes(3, hashWithSalt[0]);
+        pr.setBytes(4, hashWithSalt[1]);
+        pr.setString(5, email);
+        System.out.println("Executing");
+        pr.executeUpdate();
+
+    }
+
     public static void setRFID(String rfid, String user) throws SQLException {
         connectToDB();
         PreparedStatement pr = connection.prepareStatement(SET_RFID);
@@ -68,7 +98,7 @@ public class Database {
      * @param salt     - random salt
      * @throws SQLException - SQL error
      */
-    public static void updateUser(String email, byte[] password, byte[] salt) throws SQLException {
+    public static void addUser(String email, byte[] password, byte[] salt) throws SQLException {
         connectToDB();
         PreparedStatement pr = connection.prepareStatement(INSERT_USER);
         pr.setString(1, email);
@@ -115,20 +145,20 @@ public class Database {
 
     public static void insertImage(String name, String encode) {
         connectToDB();
-        try (PreparedStatement pr = connection.prepareStatement("INSERT INTO images VALUES (?, ?)")){
+        try (PreparedStatement pr = connection.prepareStatement("INSERT INTO images VALUES (?, ?)")) {
             pr.setString(1, name);
             pr.setString(2, encode);
             pr.executeUpdate();
-        }catch (SQLException e){
+        } catch (SQLException e) {
 
         }
     }
 
-    public static List<Image> getImages(){
+    public static List<Image> getImages() {
         connectToDB();
         List<Image> images = new ArrayList<>();
-        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT name, encode FROM images ORDER BY name DESC")){
-            while (resultSet.next()){
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT name, encode FROM images ORDER BY name DESC")) {
+            while (resultSet.next()) {
                 String name = resultSet.getString("name");
                 String encode = resultSet.getString("encode");
                 Image image = new Image(name, encode);
@@ -138,14 +168,14 @@ public class Database {
                 }
             }
             return images;
-        }catch (SQLException e){
+        } catch (SQLException e) {
             return null;
         }
     }
 
     public static List<UserCredentials> getUsersList() {
         connectToDB();
-        List <UserCredentials> users = new ArrayList<>();
+        List<UserCredentials> users = new ArrayList<>();
         try (ResultSet resultSet = connection.createStatement().executeQuery("Select email, is_online FROM users")) {
             while (resultSet.next()) {
                 String email = resultSet.getString("email");
@@ -154,7 +184,7 @@ public class Database {
                 users.add(user);
             }
             return users;
-        }catch (SQLException e){
+        } catch (SQLException e) {
             return null;
         }
     }
@@ -179,18 +209,18 @@ public class Database {
 
     public static boolean checkOnline(String id) {
         connectToDB();
-        try(PreparedStatement pr = connection.prepareStatement("UPDATE users SET is_online=NOT is_online WHERE rfid=?")){
+        try (PreparedStatement pr = connection.prepareStatement("UPDATE users SET is_online=NOT is_online WHERE rfid=?")) {
             pr.setString(1, id);
             int res = pr.executeUpdate();
-            try(PreparedStatement pr1 = connection.prepareStatement("SELECT email, is_online FROM users WHERE rfid = ?")){
+            try (PreparedStatement pr1 = connection.prepareStatement("SELECT email, is_online FROM users WHERE rfid = ?")) {
                 pr1.setString(1, id);
                 ResultSet resultSet = pr1.executeQuery();
                 resultSet.next();
                 String name = resultSet.getString(1);
                 boolean k = resultSet.getBoolean(2);
-                if (k){
+                if (k) {
                     Database.addLog("User" + name + "has entered the house.");
-                }else {
+                } else {
                     Database.addLog("User" + name + "has left the house.");
                 }
             }
@@ -203,7 +233,7 @@ public class Database {
 
     public static void smokeAlert(boolean alert) {
         connectToDB();
-        try(PreparedStatement pr = connection.prepareStatement("UPDATE smoke SET alert=?")) {
+        try (PreparedStatement pr = connection.prepareStatement("UPDATE smoke SET alert=?")) {
             pr.setBoolean(1, alert);
             pr.executeUpdate();
         } catch (SQLException e) {
@@ -213,18 +243,19 @@ public class Database {
 
     public static int getSmoke() {
         connectToDB();
-        try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM smoke")){
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM smoke")) {
             resultSet.next();
             boolean k = resultSet.getBoolean("alert");
-            if (k)return 1; else return 0;
-        }catch (SQLException e){
+            if (k) return 1;
+            else return 0;
+        } catch (SQLException e) {
             return 0;
         }
     }
 
     public static void micAlert(boolean alert) {
         connectToDB();
-        try(PreparedStatement pr = connection.prepareStatement("UPDATE mic SET alert=?")) {
+        try (PreparedStatement pr = connection.prepareStatement("UPDATE mic SET alert=?")) {
             pr.setBoolean(1, alert);
             pr.executeUpdate();
         } catch (SQLException e) {
@@ -234,18 +265,19 @@ public class Database {
 
     public static int getMic() {
         connectToDB();
-        try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM mic")){
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM mic")) {
             resultSet.next();
             boolean k = resultSet.getBoolean("alert");
-            if (k)return 1; else return 0;
-        }catch (SQLException e){
+            if (k) return 1;
+            else return 0;
+        } catch (SQLException e) {
             return 0;
         }
     }
 
     public static void flameAlert(boolean alert) {
         connectToDB();
-        try(PreparedStatement pr = connection.prepareStatement("UPDATE flame SET alert=?")) {
+        try (PreparedStatement pr = connection.prepareStatement("UPDATE flame SET alert=?")) {
             pr.setBoolean(1, alert);
             pr.executeUpdate();
         } catch (SQLException e) {
@@ -255,25 +287,26 @@ public class Database {
 
     public static int getFlame() {
         connectToDB();
-        try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM flame")){
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT alert FROM flame")) {
             resultSet.next();
             boolean k = resultSet.getBoolean("alert");
-            if (k)return 1; else return 0;
-        }catch (SQLException e){
+            if (k) return 1;
+            else return 0;
+        } catch (SQLException e) {
             return 0;
         }
     }
 
     public static void addLog(String log) {
         connectToDB();
-        try (PreparedStatement pr = connection.prepareStatement("INSERT INTO logs VALUES (?, ?)")){
+        try (PreparedStatement pr = connection.prepareStatement("INSERT INTO logs VALUES (?, ?)")) {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
             String date = dtf.format(now);
             pr.setString(1, date);
             pr.setString(2, log);
             pr.executeUpdate();
-        }catch (SQLException e){
+        } catch (SQLException e) {
 
         }
     }
@@ -281,15 +314,15 @@ public class Database {
     public static List<Log> getLogs() {
         connectToDB();
         List<Log> logs = new ArrayList<>();
-        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT date, log FROM logs ORDER BY date DESC")){
-            while (resultSet.next()){
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT date, log FROM logs ORDER BY date DESC")) {
+            while (resultSet.next()) {
                 String date = resultSet.getString("date");
                 String logstr = resultSet.getString("log");
                 Log log = new Log(date, logstr);
                 logs.add(log);
             }
             return logs;
-        }catch (SQLException e){
+        } catch (SQLException e) {
             return null;
         }
     }
@@ -298,25 +331,25 @@ public class Database {
         connectToDB();
         try {
             connection.createStatement().executeUpdate("UPDATE pir SET working = FALSE");
-        }catch (SQLException e){
+        } catch (SQLException e) {
         }
     }
 
-    public static void startPir(){
+    public static void startPir() {
         connectToDB();
         try {
             connection.createStatement().executeUpdate("UPDATE pir SET working = TRUE");
-        }catch (SQLException e){
+        } catch (SQLException e) {
         }
     }
 
-    public static boolean getPir(){
+    public static boolean getPir() {
         connectToDB();
-        try(ResultSet resultSet = connection.createStatement().executeQuery("SELECT working FROM pir")){
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT working FROM pir")) {
             resultSet.next();
             boolean k = resultSet.getBoolean(1);
             return k;
-        }catch (SQLException e){
+        } catch (SQLException e) {
             return false;
         }
     }
@@ -331,7 +364,7 @@ public class Database {
         } else {
             byte[][] hashWithSalt = hashSaltFromPassword(passwordString);
             // Update database
-            updateUser(userName, hashWithSalt[0], hashWithSalt[1]);
+            addUser(userName, hashWithSalt[0], hashWithSalt[1]);
             return true;
         }
     }
