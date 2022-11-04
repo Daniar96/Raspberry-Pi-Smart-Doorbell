@@ -50,11 +50,12 @@
                                                         type: "GET",
                                                         async: false,
                                                         success: function (number) {
-                                                            if (number === 0) {
+                                                            console.log(number)
+                                                            if (number == 0) {
                                                                 document.getElementById("alarm_status").innerHTML = "Off"
                                                             } else {
                                                                 document.getElementById("alarm_status").innerHTML = "On"
-                                                                document.getElementById("customSwitches").checked;
+                                                                document.getElementById("customSwitches").checked = true;
                                                             }
                                                         }
                                                     });
