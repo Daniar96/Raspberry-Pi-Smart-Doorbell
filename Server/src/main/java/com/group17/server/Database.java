@@ -354,6 +354,44 @@ public class Database {
         }
     }
 
+    public static void addTemp(String temp, String humidity){
+        connectToDB();
+        try (PreparedStatement pr = connection.prepareStatement("UPDATE temperature SET temp=?, humidity=?")) {
+            pr.setString(1, temp);
+            pr.setString(2, humidity);
+            pr.executeUpdate();
+        } catch (SQLException e) {
+
+        }
+    }
+
+    public static Temp getTemp(){
+        connectToDB();
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT temp, humidity FROM temperature")) {
+            resultSet.next();
+            String temp = resultSet.getString(1);
+            String humidity = resultSet.getString(2);
+            return new Temp(temp, humidity);
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    public static boolean checkInside(){
+        connectToDB();
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT COUNT (*) FROM users WHERE is_online = TRUE")) {
+            resultSet.next();
+            int i = resultSet.getInt(1);
+            if (i > 0){
+                return false;
+            }else {
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     public static boolean registerUser(String userName, String passwordString) throws SQLException {
         connectToDB();
         // Check if a user is in a database

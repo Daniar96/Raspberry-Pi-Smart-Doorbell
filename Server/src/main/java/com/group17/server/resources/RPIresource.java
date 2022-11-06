@@ -92,7 +92,7 @@ public class RPIresource {
     @Path("/image")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getImage(Image image){
-        if (Database.getPir()){
+        if (Database.getPir() && Database.checkInside()){
             Database.addLog("PIR sensor has detected movement");
             Database.insertImage(image.getName(), image.getEncode());
         }
@@ -124,5 +124,21 @@ public class RPIresource {
         }
         return Response.status(200).entity(i).build();
     }
+
+    @POST
+    @Path("/setTemp")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setTemp(Temp t){
+        Database.addTemp(t.getTemp(), t.getHumidity());
+        return Response.status(200).build();
+    }
+
+    @GET
+    @Path("/temp")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTemp(){
+        return Response.status(200).entity(Database.getTemp()).build();
+    }
+
 
 }
