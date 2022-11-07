@@ -104,6 +104,10 @@ function update_dashboard() {
         }
     });
 
+    setTimeout(update_dashboard, 1000);
+}
+
+function update_image() {
     // upload last image taken
     $.ajax({
         url: `http://localhost:8080/Server_war/api/images`,
@@ -123,9 +127,8 @@ function update_dashboard() {
         }
     });
 
-    setTimeout(update_dashboard, 10000);
+    setTimeout(update_image, 10000);
 }
 
-$(document).ready(function() {
-    setTimeout(update_dashboard, 10000);
-});
+update_dashboard();
+update_image();
