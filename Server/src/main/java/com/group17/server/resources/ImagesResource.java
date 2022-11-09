@@ -16,12 +16,12 @@ import org.glassfish.jersey.server.ContainerRequest;
 import java.sql.SQLException;
 import java.util.List;
 
+@Path("/images")
 public class ImagesResource {
 
     @Context
     private ContainerRequest request;
 
-    @Path("/images")
     @TokenCheck
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -34,10 +34,9 @@ public class ImagesResource {
         }
     }
 
-    @Path("/image")
+    @Path("/last")
     @TokenCheck
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getImage(){
         try {
             return Response.status(200).entity(DAO.getImage(getRpiIDFromUser())).build();

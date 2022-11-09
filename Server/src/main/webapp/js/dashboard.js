@@ -110,10 +110,11 @@ function update_dashboard() {
 function update_image() {
     // upload last image taken
     $.ajax({
-        url: `http://localhost:8080/Server_war/api/image`,
+        url: `http://localhost:8080/Server_war/api/images/last`,
         type: "GET",
         async: false,
         success: function (response) {
+            console.log(response)
             let encoding = response;
             let image = new Image();
             image.src = `data:image/png;base64,${encoding}`;
