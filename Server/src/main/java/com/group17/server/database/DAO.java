@@ -23,10 +23,14 @@ public class DAO {
     }
 
     public static void setUserInfo(String email, UserInfo userInfo) throws SQLException {
-        byte[][] hashWithSalt = hashSaltFromPassword(userInfo.getPassword());
-        assert hashWithSalt != null;
-        String[] stringArgs = new String[]{userInfo.getFull_name(), userInfo.getUsername(), email};
-        Database.update(SET_USER_INFO, hashWithSalt, stringArgs);
+        if (userInfo.getPassword() == null) {
+            Database.update(SET_USER_INFO, userInfo.getFull_name(), userInfo.getUsername(), email);
+        } else {
+            byte[][] hashWithSalt = hashSaltFromPassword(userInfo.getPassword());
+            assert hashWithSalt != null;
+            String[] stringArgs = new String[]{userInfo.getFull_name(), userInfo.getUsername(), email};
+            Database.update(SET_USER_INFO_PASSWORD, hashWithSalt, stringArgs);
+        }
     }
 
     public static void addUser(String email, byte[][] hashWithSalt, String rfid) throws SQLException {

@@ -19,7 +19,7 @@ public class UserInfo {
                     this.username = jsonArray[i + 1];
                     break;
                 case "full_name":
-                    this.full_name = jsonArray[i + 1].substring(3);
+                    this.full_name = jsonArray[i + 1];
                     break;
                 default:
                     break;

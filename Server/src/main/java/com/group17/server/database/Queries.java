@@ -18,7 +18,6 @@ public class Queries {
 
     static final String GET_USER = "SELECT to_jsonb(data) FROM (SELECT u.email, u.hashed_password, u.salt FROM safe_home.users u WHERE u.email = ?) as data;";
     static final String GET_USER_INFO = "SELECT to_jsonb(data) FROM (SELECT u.username, u.full_name FROM safe_home.users u WHERE u.email = ?) as data;";
-    static final String GET_USER_LIST = "SELECT to_jsonb(data) FROM (SELECT u.email, u.username,u.full_name FROM safe_home.users u) as data;";
     static final String GET_AT_HOME_TAGS = "SELECT u.username, a.at_home FROM allowed_tags a, users u WHERE a.rpi_id = ? AND u.rfid = a.rfid;";
     static final String GET_AT_HOME_TAG = "SELECT u.username, a.at_home FROM allowed_tags a, users u WHERE a.rpi_id = ? AND u.rfid = a.rfid AND a.rfid = ?;";
     static final String GET_IMAGES = "SELECT name, encoding FROM images WHERE rpi_id = ? ORDER BY name DESC;";
@@ -33,8 +32,9 @@ public class Queries {
     static final String INSERT_USER = "INSERT INTO users (hashed_password, salt, email, username, rfid) VALUES (?, ?, ?, ?, ?);";
     static final String INSERT_IMAGE= "INSERT INTO images (rpi_id, name, encoding) VALUES (?, ?, ?);";
     static final String INSERT_LOG = "INSERT INTO logs (rpi_id, date, log) VALUES (?, ?, ?);";
-    static final String SET_USER_INFO = "UPDATE users SET hashed_password = ?, salt = ?, full_name = ?, username = ?  WHERE email = ?;";
-     static final String SWITCH_AT_HOME = "UPDATE allowed_tags SET at_home = NOT at_home WHERE rfid=?;";
+    static final String SET_USER_INFO_PASSWORD = "UPDATE users SET hashed_password = ?, salt = ?, full_name = ?, username = ?  WHERE email = ?;";
+    static final String SET_USER_INFO = "UPDATE users SET full_name = ?, username = ?  WHERE email = ?;";
+    static final String SWITCH_AT_HOME = "UPDATE allowed_tags SET at_home = NOT at_home WHERE rfid=?;";
     static final String SET_SMOKE_ALERT = "UPDATE rpi SET is_smoke_alert=? WHERE rpi_id = ?;";
     static final String SET_MIC_ALERT = "UPDATE rpi SET is_mic_alert=? WHERE rpi_id = ?;";
     static final String SET_FLAME_ALERT = "UPDATE rpi SET is_flame_alert=? WHERE rpi_id = ?;";
