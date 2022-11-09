@@ -41,7 +41,7 @@ for (let index in users) {
     span.classList.add("rounded-pill")
     span.classList.add("d-inline")
 
-    if (users[index]["at_home"]) {
+    if (users[index]["athome"]) {
         span.classList.add("bg-success")
         span.innerHTML = "Present"
     } else {

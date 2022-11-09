@@ -104,7 +104,7 @@ function update_dashboard() {
         }
     });
 
-    setTimeout(update_dashboard, 1000);
+    // setTimeout(update_dashboard, 1000);
 }
 
 function update_image() {
@@ -127,7 +127,7 @@ function update_image() {
         }
     });
 
-    setTimeout(update_image, 10000);
+    // setTimeout(update_image, 10000);
 }
 
 update_dashboard();
