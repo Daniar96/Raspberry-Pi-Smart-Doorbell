@@ -69,7 +69,7 @@ public class RPIresource {
         if (DAO.getPir(getRpiID()) && !DAO.arePeopleInside(getRpiID())){
             DAO.addLog("PIR sensor has detected movement", getRpiID());
             try {
-                DAO.addImage("101",image.getName(), image.getEncode());
+                DAO.addImage(getRpiID(),image.getName(), image.getEncode());
             } catch (SQLException e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ServerError("SQL error")).build();
             }
@@ -116,7 +116,7 @@ public class RPIresource {
     @Path("/smokeAlert")
     @Produces(MediaType.APPLICATION_JSON)
     public Response smokeAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getSmoke(getRpiID())).build();
+        return Response.status(200).entity(DAO.getSmoke(getRpiIDFromUser())).build();
     }
 
 
@@ -126,7 +126,7 @@ public class RPIresource {
     @Path("/flameAlert")
     @Produces(MediaType.APPLICATION_JSON)
     public Response flameAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getFlame(getRpiID())).build();
+        return Response.status(200).entity(DAO.getFlame(getRpiIDFromUser())).build();
     }
 
 
@@ -136,7 +136,7 @@ public class RPIresource {
     @Path("/micAlert")
     @Produces(MediaType.APPLICATION_JSON)
     public Response micAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getMic(getRpiID())).build();
+        return Response.status(200).entity(DAO.getMic(getRpiIDFromUser())).build();
     }
 
     @TokenCheck
@@ -144,7 +144,7 @@ public class RPIresource {
     @Path("/getPIR")
     public Response getSensor() throws SQLException {
         int i;
-        if (DAO.getPir(getRpiID())){
+        if (DAO.getPir(getRpiIDFromUser())){
             i = 1;
         }else {
             i = 0;
@@ -156,7 +156,7 @@ public class RPIresource {
     @Path("/temp")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTemp() throws SQLException {
-        return Response.status(200).entity(DAO.getTemp(getRpiID())).build();
+        return Response.status(200).entity(DAO.getTemp(getRpiIDFromUser())).build();
     }
 
     private String getRpiIDFromUser() throws SQLException {
