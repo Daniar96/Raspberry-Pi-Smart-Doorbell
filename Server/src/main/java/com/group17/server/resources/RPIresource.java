@@ -26,6 +26,7 @@ public class RPIresource {
     public Response smokeAlertRpi(SmokeAlert alert) throws SQLException {
         boolean isSmoke = alert.getAlert() == 1;
         DAO.smokeAlert(isSmoke, getRpiID());
+        DAO.addLog("Smoke was detected in the house", getRpiID());
         return Response.status(200).build();
     }
     @RfidPasswordCheck
@@ -36,6 +37,7 @@ public class RPIresource {
     public Response flameAlertRpi(FlameAlert alert) throws SQLException {
         boolean isFlame = alert.getAlert() == 1;
         DAO.flameAlert(isFlame, getRpiID());
+        DAO.addLog("Fire was detected in the house", getRpiID());
         return Response.status(200).build();
     }
     @RfidPasswordCheck
