@@ -18,50 +18,56 @@ public class RPIresource {
     @Context
     private ContainerRequest request;
 
+    @RfidPasswordCheck
     @POST
     @Path("/smoke")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response smokeAlertRpi(SmokeAlert alert) throws SQLException {
         boolean isSmoke = alert.getAlert() == 1;
-        DAO.smokeAlert(isSmoke, "101");
+        DAO.smokeAlert(isSmoke, getRpiID());
         return Response.status(200).build();
     }
+    @RfidPasswordCheck
     @POST
     @Path("/flame")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response flameAlertRpi(FlameAlert alert) throws SQLException {
         boolean isFlame = alert.getAlert() == 1;
-        DAO.flameAlert(isFlame, "101");
+        DAO.flameAlert(isFlame, getRpiID());
         return Response.status(200).build();
     }
+    @RfidPasswordCheck
     @POST
     @Path("/mic")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response smokeAlertRpi(MicAlert alert) throws SQLException {
         boolean isMic= alert.getAlert() == 1;
-        DAO.micAlert(isMic, "101");
+        DAO.micAlert(isMic, getRpiID());
         return Response.status(200).build();
     }
+    @RfidPasswordCheck
     @POST
     @Path("/authorize")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response checkTag(TagID id) throws SQLException {
-        if (DAO.checkOnline(id.getTagID(),"101")){
+        if (DAO.checkOnline(id.getTagID(),getRpiID())){
             return Response.status(200).build();
         }else {
             return Response.status(401).build();
         }
     }
+
+    @RfidPasswordCheck
     @POST
     @Path("/image")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getImage(Image image) throws SQLException {
-        if (DAO.getPir("101") && !DAO.arePeopleInside("101")){
-            DAO.addLog("PIR sensor has detected movement", "101");
+        if (DAO.getPir(getRpiID()) && !DAO.arePeopleInside(getRpiID())){
+            DAO.addLog("PIR sensor has detected movement", getRpiID());
             try {
                 DAO.addImage("101",image.getName(), image.getEncode());
             } catch (SQLException e) {
@@ -105,40 +111,40 @@ public class RPIresource {
         return Response.status(200).build();
     }
 
+    @TokenCheck
     @GET
     @Path("/smokeAlert")
     @Produces(MediaType.APPLICATION_JSON)
     public Response smokeAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getSmoke("101")).build();
+        return Response.status(200).entity(DAO.getSmoke(getRpiID())).build();
     }
 
 
 
+    @TokenCheck
     @GET
     @Path("/flameAlert")
     @Produces(MediaType.APPLICATION_JSON)
     public Response flameAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getFlame("101")).build();
+        return Response.status(200).entity(DAO.getFlame(getRpiID())).build();
     }
 
 
 
+    @TokenCheck
     @GET
     @Path("/micAlert")
     @Produces(MediaType.APPLICATION_JSON)
     public Response micAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getMic("101")).build();
+        return Response.status(200).entity(DAO.getMic(getRpiID())).build();
     }
 
-
-
-
-
+    @TokenCheck
     @GET
     @Path("/getPIR")
     public Response getSensor() throws SQLException {
         int i;
-        if (DAO.getPir("101")){
+        if (DAO.getPir(getRpiID())){
             i = 1;
         }else {
             i = 0;
@@ -150,7 +156,7 @@ public class RPIresource {
     @Path("/temp")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTemp() throws SQLException {
-        return Response.status(200).entity(DAO.getTemp("101")).build();
+        return Response.status(200).entity(DAO.getTemp(getRpiID())).build();
     }
 
     private String getRpiIDFromUser() throws SQLException {

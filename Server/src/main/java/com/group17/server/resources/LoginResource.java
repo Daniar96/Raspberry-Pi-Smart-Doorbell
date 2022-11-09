@@ -34,8 +34,9 @@ public class LoginResource {
 
             NewCookie session_id = new NewCookie("SESSION_ID", ut.getToken(), "/", "safe_home",
                     "JWT token", 600, true, true);
-            return Response.status(Response.Status.OK).cookie(session_id).entity(ut).build();
 
+//            return Response.status(Response.Status.OK).header("SET-COOKIE", session_id).entity(ut).build();
+            return Response.status(Response.Status.OK).header("SET-COOKIE", "SESSION_ID=" + ut.getToken() + "; HttpOnly; Path=/;").build();
 
         } catch (SQLException e) {
             e.printStackTrace();

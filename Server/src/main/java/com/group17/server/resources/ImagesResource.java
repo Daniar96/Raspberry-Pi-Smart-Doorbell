@@ -2,6 +2,7 @@ package com.group17.server.resources;
 
 import com.group17.JSONObjects.Image;
 import com.group17.JSONObjects.ServerError;
+import com.group17.server.TokenCheck;
 import com.group17.server.database.DAO;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -15,6 +16,7 @@ import java.util.List;
 @Path("/images")
 public class ImagesResource {
 
+    @TokenCheck
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getImages(){
