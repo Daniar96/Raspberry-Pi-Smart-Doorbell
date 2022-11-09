@@ -1,6 +1,7 @@
 package com.group17.server.resources;
 
 import com.group17.JSONObjects.*;
+import com.group17.server.RfidPasswordCheck;
 import com.group17.server.database.DAO;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -125,6 +126,7 @@ public class RPIresource {
         return Response.status(200).build();
     }
 
+    @RfidPasswordCheck
     @GET
     @Path("/temp")
     @Produces(MediaType.APPLICATION_JSON)

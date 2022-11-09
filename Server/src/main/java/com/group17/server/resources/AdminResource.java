@@ -1,12 +1,9 @@
 package com.group17.server.resources;
 
-import com.group17.JSONObjects.Rfid_Password;
+import com.group17.JSONObjects.RpiID_Password;
 import com.group17.JSONObjects.ServerError;
 import com.group17.server.database.DAO;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -22,12 +19,22 @@ public class AdminResource {
     }
 
 
-    @Path("/rfid")
+    @Path("/rpi")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response setRFID(Rfid_Password rfid_password) throws SQLException {
-        DAO.registerRpi(rfid_password.getRf_id(),rfid_password.getPassword());
-        return Response.status(Response.Status.OK).build();
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setRFID(RpiID_Password rpiID_password) {
+        try {
+            if (DAO.registerRpi(rpiID_password.getRpi_id(), rpiID_password.getPassword())) {
+                return Response.status(Response.Status.OK).entity(rpiID_password).build();
+            } else {
+                return Response.status(Response.Status.CONFLICT)
+                        .entity(new ServerError("The rpi_id is already registered")).build();
+            }
+        } catch (SQLException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ServerError("SQL error")).build();
+        }
+
     }
-    
+
 }

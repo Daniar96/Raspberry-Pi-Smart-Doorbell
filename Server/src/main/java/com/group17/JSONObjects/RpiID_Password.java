@@ -1,15 +1,15 @@
 package com.group17.JSONObjects;
 
-public class Rfid_Password {
-    private String rf_id;
+public class RpiID_Password {
+    private String rpi_id;
     private String password;
 
-    public String getRf_id() {
-        return rf_id;
+    public String getRpi_id() {
+        return rpi_id;
     }
 
-    public void setRf_id(String rf_id) {
-        this.rf_id = rf_id;
+    public void setRpi_id(String rpi_id) {
+        this.rpi_id = rpi_id;
     }
 
     public String getPassword() {

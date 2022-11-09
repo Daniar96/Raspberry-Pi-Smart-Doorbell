@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class SecurityFunctions {
 
@@ -14,31 +15,22 @@ public class SecurityFunctions {
     public static String HASH_FUNCTION = "SHA-256";
 
     private static final char[] CHARS_ARRAY = "abcdefghijklmnopqrstuvwxyz1234567890".toCharArray();
-
-
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
-        }
-        return data;
-    }
+    private static final Base64.Encoder encoder = Base64.getEncoder();
 
     public static String[] hashSaltFromPassword(String passwordString) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance(HASH_FUNCTION);
             SecureRandom srd = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, PROVIDER);
             // Create random salt
-            byte[] salt = new byte[20];
-            srd.nextBytes(salt);
+            String salt = getRandomString(20);
             // combine salt with a password
-            String saltPlusPlainTextPassword = passwordString + new String(salt);
+            String saltPlusPlainTextPassword = passwordString + salt;
             // Hash password and salt
-            messageDigest.update(saltPlusPlainTextPassword.getBytes(StandardCharsets.UTF_8));
+            messageDigest.update(saltPlusPlainTextPassword.getBytes());
             String[] toReturn = new String[2];
-            toReturn[0] = Arrays.toString(messageDigest.digest());
-            toReturn[1] = Arrays.toString(salt);
+
+            toReturn[0] = encoder.encodeToString(messageDigest.digest());
+            toReturn[1] = salt;
             return toReturn;
 
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
@@ -62,17 +54,16 @@ public class SecurityFunctions {
 
     }
 
-    public static boolean passwordsEqual(String plainPassword, String saltHexStr, String hashPswrdHexStr) {
+    public static boolean passwordsEqual(String plainPassword, String salt, String hashedPasswordStored) {
 
         try {
             MessageDigest messageDigest = MessageDigest.getInstance(HASH_FUNCTION);
             // Digest salt and plain password
-            messageDigest.update(
-                    (plainPassword + new String(hexStringToByteArray(saltHexStr))).getBytes(StandardCharsets.UTF_8));
+            String saltPlusPlainTextPassword = plainPassword + salt;
+            messageDigest.update(saltPlusPlainTextPassword.getBytes());
             // Arrays with 2 passwords (from database, from user)
-            byte[] hashedPasswordTocheck = messageDigest.digest();
-            byte[] hashedPasswordStored = hexStringToByteArray(hashPswrdHexStr);
-            return Arrays.equals(hashedPasswordTocheck, hashedPasswordStored);
+            String hashedPasswordTocheck = encoder.encodeToString(messageDigest.digest());
+            return hashedPasswordTocheck.equals(hashedPasswordStored);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return false;

@@ -28,21 +28,36 @@ public class DAO {
         } else {
             String[] hashWithSalt = hashSaltFromPassword(userInfo.getPassword());
             assert hashWithSalt != null;
-            Database.update(SET_USER_INFO_PASSWORD, hashWithSalt[0],hashWithSalt[1], userInfo.getFull_name(), userInfo.getUsername(), email);
+            Database.update(SET_USER_INFO_PASSWORD, hashWithSalt[0], hashWithSalt[1], userInfo.getFull_name(), userInfo.getUsername(), email);
         }
     }
 
     public static void addUser(String email, String[] hashWithSalt, String rfid) throws SQLException {
         //Add a new user with email = email and username = email
-        Database.update(INSERT_USER, hashWithSalt[0],hashWithSalt[1], email, email, rfid);
+        Database.update(INSERT_USER, hashWithSalt[0], hashWithSalt[1], email, email, rfid);
     }
 
-    public static String getUser(String userName) throws SQLException {
-        return Database.getString(GET_USER, userName);
+    public static HashedUserCredentials getUser(String userName) throws SQLException {
+        ResultSet resultSet = Database.getResultSet(GET_USER, userName);
+        if (resultSet.next()) {
+            String password = resultSet.getString("hashed_password");
+            String salt = resultSet.getString("salt");
+            String email = resultSet.getString("email");
+            return new HashedUserCredentials(email, password, salt);
+        } else {
+            return null;
+        }
     }
 
-    public static String getRpiPasswordSalt(String rpi_id) throws SQLException {
-        return Database.getString(GET_RPI_PASSWORD_SALT, rpi_id);
+    public static HashedUserCredentials getRpiPasswordSalt(String rpi_id) throws SQLException {
+        ResultSet resultSet = Database.getResultSet(GET_USER, rpi_id);
+        if (resultSet.next()) {
+            String password = resultSet.getString("hashed_password");
+            String salt = resultSet.getString("salt");
+            return new HashedUserCredentials(password, salt);
+        } else {
+            return null;
+        }
     }
 
     public static List<Username_AtHomeStatus> getAtHomeList(String rpi_id) throws SQLException {
@@ -60,7 +75,7 @@ public class DAO {
 
     public static boolean registerUser(String userName, String passwordPlain, String rfid) throws SQLException {
         // Check if a user is in a database
-        String user = getUser(userName);
+        HashedUserCredentials user = getUser(userName);
         if (user != null) {
             return false;
 
@@ -73,14 +88,14 @@ public class DAO {
     }
 
     public static boolean registerRpi(String rpi_id, String passwordPlain) throws SQLException {
-        String rpi = getRpiPasswordSalt(rpi_id);
+        HashedUserCredentials rpi = getRpiPasswordSalt(rpi_id);
         if (rpi != null) {
             return false;
 
         } else {
             String[] hashWithSalt = hashSaltFromPassword(passwordPlain);
             // Update database
-            Database.update(INSERT_RPI, hashWithSalt[0], hashWithSalt[1],rpi_id);
+            Database.update(INSERT_RPI, hashWithSalt[0], hashWithSalt[1], rpi_id);
             return true;
         }
 
@@ -89,8 +104,7 @@ public class DAO {
     public static boolean checkUser(String userName, String plainPassword) throws SQLException {
         try {
             // Get JSON object with user credentials for given userName
-            String credentialsString = getUser(userName);
-            HashedUserCredentials credentials = new HashedUserCredentials(credentialsString);
+            HashedUserCredentials credentials = getUser(userName);
             // Get hexadecimal representation of a salt and a password
             String saltHexStr = credentials.getSalt();
             String hashPswrdHexStr = credentials.getHashed_password();
@@ -212,8 +226,7 @@ public class DAO {
     }
 
     public static String[] getRpi_hashedPassword_salt(String rpi_id) throws SQLException {
-        String credentialsString = getRpiPasswordSalt(rpi_id);
-        HashedUserCredentials credentials = new HashedUserCredentials(credentialsString);
+        HashedUserCredentials credentials = getRpiPasswordSalt(rpi_id);
         // Get hexadecimal representation of a salt and a password
         String saltHexStr = credentials.getSalt();
         String hashPswrdHexStr = credentials.getHashed_password();

@@ -5,30 +5,18 @@ public class HashedUserCredentials {
 	private String salt;
 	private String hashed_password;
 
-	public HashedUserCredentials() {
+	public HashedUserCredentials(){}
+	public HashedUserCredentials(String email, String hashed_password, String salt) {
+		this.username = email;
+		this.hashed_password = hashed_password;
+		this.salt = salt;
+	}
+	public HashedUserCredentials(String hashed_password, String salt) {
+		this.hashed_password = hashed_password;
+		this.salt = salt;
 	}
 
-	public HashedUserCredentials(String jsonString) throws NullPointerException {
-		if (jsonString.equals("{}")){
-			throw new NullPointerException("There is no user credentials");
-		}
-		String[] jsonArray = jsonString.split("\\\": \"|\\\", \"|\\\"}|\\{\"");
-		for (int i = 1; i < jsonArray.length; i++) {
-			switch (jsonArray[i]) {
-			case "email":
-				this.username = jsonArray[i + 1];
-				break;
-			case "hashed_password":
-				this.hashed_password = jsonArray[i + 1].substring(3);
-				break;
-			case "salt":
-				this.salt = jsonArray[i + 1].substring(3);
-				break;
-			default:
-				break;
-			}
-		}
-	}
+
 
 	public String getSalt() {
 		return salt;
@@ -52,6 +40,9 @@ public class HashedUserCredentials {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	public boolean isEmpty(){
+		return this.salt ==null || this.hashed_password == null;
 	}
 
 }

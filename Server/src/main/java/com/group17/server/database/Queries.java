@@ -17,8 +17,8 @@ public class Queries {
     static final String CREATE = CREATE_SCHEMA + CREATE_USERS + CREATE_RPI + CREATE_TAGS + CREATE_IMAGES + CREATE_LOGS;
 
 
-    static final String GET_USER = "SELECT to_jsonb(data) FROM (SELECT u.email, u.hashed_password, u.salt FROM safe_home.users u WHERE u.email = ?) as data;";
-    static final String GET_RPI_PASSWORD_SALT = "SELECT to_jsonb(data) FROM (SELECT hashed_password, salt FROM rpi WHERE rpi_id = ?) as data;";
+    static final String GET_USER = "SELECT u.email, u.hashed_password, u.salt FROM safe_home.users u WHERE u.email = ?;";
+    static final String GET_RPI_PASSWORD_SALT = "SELECT hashed_password, salt FROM rpi WHERE rpi_id = ?;";
     static final String GET_USER_INFO = "SELECT to_jsonb(data) FROM (SELECT u.username, u.full_name FROM safe_home.users u WHERE u.email = ?) as data;";
     static final String GET_AT_HOME_TAGS = "SELECT u.username, a.at_home FROM allowed_tags a, users u WHERE a.rpi_id = ? AND u.rfid = a.rfid;";
     static final String GET_AT_HOME_TAG = "SELECT u.username, a.at_home FROM allowed_tags a, users u WHERE a.rpi_id = ? AND u.rfid = a.rfid AND a.rfid = ?;";
