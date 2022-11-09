@@ -29,6 +29,7 @@ public class Queries {
     static final String GET_PIR_STATUS = "SELECT pir_is_on FROM rpi WHERE rpi_id = ?;";
     static final String GET_TEMPERATURE_HUMIDITY = "SELECT temperature, humidity FROM rpi WHERE rpi_id = ?;";
     static final String GET_LOGS = "SELECT date, log FROM logs WHERE rpi_id = ? ORDER BY date DESC;";
+    static final String GET_RPI_FROM_EMAIL = "SELECT r.rpi_id FROM rpi r, users u, allowed_tags a WHERE u.email = ? AND u.rfid = a.rfid AND a.rpi_id = r.rpi_id;";
     static final String COUNT_AT_HOME = "SELECT COUNT (*) FROM allowed_tags WHERE is_online = TRUE AND rpi_id = ?";
 
     static final String INSERT_USER = "INSERT INTO users (hashed_password, salt, email, username, rfid) VALUES (?, ?, ?, ?, ?);";

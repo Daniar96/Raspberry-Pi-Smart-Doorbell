@@ -2,8 +2,11 @@ package com.group17.server.resources;
 
 import com.group17.JSONObjects.*;
 import com.group17.server.RfidPasswordCheck;
+import com.group17.server.TokenCheck;
+import com.group17.server.TokenList;
 import com.group17.server.database.DAO;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -12,6 +15,7 @@ import java.sql.SQLException;
 
 @Path("/RPI")
 public class RPIresource {
+    @Context
     private ContainerRequest request;
 
     @POST
@@ -23,14 +27,6 @@ public class RPIresource {
         DAO.smokeAlert(isSmoke, "101");
         return Response.status(200).build();
     }
-
-    @GET
-    @Path("/smokeAlert")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response smokeAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getSmoke("101")).build();
-    }
-
     @POST
     @Path("/flame")
     @Produces(MediaType.APPLICATION_JSON)
@@ -40,14 +36,6 @@ public class RPIresource {
         DAO.flameAlert(isFlame, "101");
         return Response.status(200).build();
     }
-
-    @GET
-    @Path("/flameAlert")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response flameAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getFlame("101")).build();
-    }
-
     @POST
     @Path("/mic")
     @Produces(MediaType.APPLICATION_JSON)
@@ -57,14 +45,6 @@ public class RPIresource {
         DAO.micAlert(isMic, "101");
         return Response.status(200).build();
     }
-
-    @GET
-    @Path("/micAlert")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response micAlertWeb() throws SQLException {
-        return Response.status(200).entity(DAO.getMic("101")).build();
-    }
-
     @POST
     @Path("/authorize")
     @Produces(MediaType.APPLICATION_JSON)
@@ -76,7 +56,6 @@ public class RPIresource {
             return Response.status(401).build();
         }
     }
-
     @POST
     @Path("/image")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -92,19 +71,68 @@ public class RPIresource {
         return Response.status(200).build();
     }
 
+
+    @RfidPasswordCheck
     @POST
-    @Path("/closePIR")
-    public Response stopSensor() throws SQLException {
-        DAO.stopPir("101");
+    @Path("/setTemp")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setTemp(Temp t) throws SQLException {
+        DAO.addTemp(t.getTemp(), t.getHumidity(), getRpiID());
         return Response.status(200).build();
     }
 
+    /**
+     * Retrieves rpi_id from a cookie
+     * @return - rpi_id
+     */
+    private String getRpiID(){
+        return request.getRequestCookies().get("rpi_id").getValue();
+    }
+
+    @TokenCheck
+    @POST
+    @Path("/closePIR")
+    public Response stopSensor() throws SQLException {
+        DAO.stopPir(getRpiIDFromUser());
+        return Response.status(200).build();
+    }
+
+    @TokenCheck
     @POST
     @Path("/startPIR")
     public Response startSensor() throws SQLException {
-        DAO.startPir("101");
+        DAO.startPir(getRpiIDFromUser());
         return Response.status(200).build();
     }
+
+    @GET
+    @Path("/smokeAlert")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response smokeAlertWeb() throws SQLException {
+        return Response.status(200).entity(DAO.getSmoke("101")).build();
+    }
+
+
+
+    @GET
+    @Path("/flameAlert")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response flameAlertWeb() throws SQLException {
+        return Response.status(200).entity(DAO.getFlame("101")).build();
+    }
+
+
+
+    @GET
+    @Path("/micAlert")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response micAlertWeb() throws SQLException {
+        return Response.status(200).entity(DAO.getMic("101")).build();
+    }
+
+
+
+
 
     @GET
     @Path("/getPIR")
@@ -118,25 +146,15 @@ public class RPIresource {
         return Response.status(200).entity(i).build();
     }
 
-    @POST
-    @Path("/setTemp")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response setTemp(Temp t) throws SQLException {
-        DAO.addTemp(t.getTemp(), t.getHumidity(), "101");
-        return Response.status(200).build();
-    }
-
-    @RfidPasswordCheck
     @GET
     @Path("/temp")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTemp() throws SQLException {
-        return Response.status(200).entity(DAO.getTemp(getRpiID())).build();
+        return Response.status(200).entity(DAO.getTemp("101")).build();
     }
 
-    private String getRpiID(){
-        return request.getRequestCookies().get("rpi_id").getValue();
+    private String getRpiIDFromUser() throws SQLException {
+        String email = TokenList.getUser(request.getRequestCookies().get("SESSION_ID").getValue());
+        return  DAO.getRpiFromEmail(email);
     }
-
-
 }

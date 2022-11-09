@@ -39,7 +39,7 @@ public class RpiFilter implements ContainerRequestFilter {
     private void abortWithUnauthorized(ContainerRequestContext requestContext, String msg) {
         // Abort with 401 error and error message
         requestContext.abortWith(
-                Response.status(Response.Status.UNAUTHORIZED).entity(new ServerError(msg)).build());
+                Response.status(Response.Status.UNAUTHORIZED).build());
     }
 
     private boolean validCredentials(String rpi_id, String pass) {

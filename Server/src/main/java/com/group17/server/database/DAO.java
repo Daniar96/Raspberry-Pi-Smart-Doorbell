@@ -50,7 +50,7 @@ public class DAO {
     }
 
     public static HashedUserCredentials getRpiPasswordSalt(String rpi_id) throws SQLException {
-        ResultSet resultSet = Database.getResultSet(GET_USER, rpi_id);
+        ResultSet resultSet = Database.getResultSet(GET_RPI_PASSWORD_SALT, rpi_id);
         if (resultSet.next()) {
             String password = resultSet.getString("hashed_password");
             String salt = resultSet.getString("salt");
@@ -228,11 +228,12 @@ public class DAO {
     public static String[] getRpi_hashedPassword_salt(String rpi_id) throws SQLException {
         HashedUserCredentials credentials = getRpiPasswordSalt(rpi_id);
         // Get hexadecimal representation of a salt and a password
-        String saltHexStr = credentials.getSalt();
-        String hashPswrdHexStr = credentials.getHashed_password();
 
-        return new String[]{hashPswrdHexStr, saltHexStr};
+        return new String[]{credentials.getHashed_password(), credentials.getSalt()};
 
     }
 
+    public static String getRpiFromEmail(String email) throws SQLException {
+        return Database.getString(GET_RPI_FROM_EMAIL,email);
+    }
 }
