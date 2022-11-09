@@ -135,7 +135,7 @@ public class RPIresource {
     }
 
     private String getRpiID(){
-        return request.getRequestCookies().get("rf_id").getValue();
+        return request.getRequestCookies().get("rpi_id").getValue();
     }
 
 
