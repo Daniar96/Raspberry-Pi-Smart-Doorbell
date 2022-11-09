@@ -1,7 +1,7 @@
 package com.group17.server.resources;
 import com.group17.JSONObjects.ServerError;
 import com.group17.JSONObjects.UserInfo;
-import com.group17.server.Database;
+import com.group17.server.database.DAO;
 import com.group17.server.SecurityCheck;
 import com.group17.server.TokenList;
 import jakarta.ws.rs.*;
@@ -23,7 +23,7 @@ public class AccountResource {
     public Response getUserInfo(){
         String email = TokenList.getUser(request.getRequestCookies().get("SESSION_ID").getValue());
         try {
-            UserInfo info = Database.getUserInfo(email);
+            UserInfo info = DAO.getUserInfo(email);
             return Response.status(200).entity(info).build();
         } catch (SQLException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ServerError("SQL error")).build();
@@ -39,7 +39,7 @@ public class AccountResource {
         System.out.println("Email " + email);
         //Email can't be null because security check was already performed
         try {
-            Database.setUserInfo(email,userInfo);
+            DAO.setUserInfo(email,userInfo);
             return Response.status(200).build();
         } catch (SQLException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ServerError("SQL error")).build();

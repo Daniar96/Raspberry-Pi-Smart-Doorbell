@@ -25,7 +25,7 @@ public class UserInfo {
                     break;
             }
         }
-        this.password = "";
+        this.password = "hidden";
     }
     public String getFull_name() {
         return full_name;

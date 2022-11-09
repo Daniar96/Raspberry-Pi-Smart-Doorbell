@@ -5,7 +5,8 @@ import java.sql.SQLException;
 import com.group17.JSONObjects.ServerError;
 import com.group17.JSONObjects.UserCredentials;
 import com.group17.JSONObjects.Username_Token;
-import com.group17.server.Database;
+import com.group17.server.database.DAO;
+import com.group17.server.database.Database;
 import com.group17.server.TokenList;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -23,7 +24,7 @@ public class LoginResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response login(UserCredentials input) {
         try {
-            boolean authorised = Database.checkUser(input.getUsername(), input.getPassword());
+            boolean authorised = DAO.checkUser(input.getUsername(), input.getPassword());
             if (!authorised) {
                 return Response.status(Response.Status.FORBIDDEN).entity(new ServerError("Wrong user credentials"))
                         .build();
@@ -31,9 +32,9 @@ public class LoginResource {
             Username_Token ut = new Username_Token(input.getUsername());
             TokenList.addToken(ut);
 
-            NewCookie session_id = new NewCookie("SESSION_ID", ut.getToken(), "/", "domain",
+            NewCookie session_id = new NewCookie("SESSION_ID", ut.getToken(), "/", "safe_home",
                     "JWT token", 600, true, true);
-            return Response.status(Response.Status.OK).cookie(session_id).header("COOKIE", "SESSION_ID=" + ut.getToken()+";2").entity(ut).build();
+            return Response.status(Response.Status.OK).cookie(session_id).entity(ut).build();
 
 
         } catch (SQLException e) {
@@ -49,7 +50,7 @@ public class LoginResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(UserCredentials input) {
         try {
-            boolean registered = Database.registerUser(input.getUsername(), input.getPassword());
+            boolean registered = DAO.registerUser(input.getUsername(), input.getPassword(), input.getRfid());
             if (registered) {
                 return Response.status(Response.Status.OK).entity(input).build();
             } else {

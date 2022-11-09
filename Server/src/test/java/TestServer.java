@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class TestServer {
-    String DEFAULT_USERNAME = "newuser@gmail.com";
+    String DEFAULT_USERNAME = "bogdan@gmail.com";
     String DEFAULT_PASSWORD = "password";
     String username;
     String pass;
@@ -77,18 +77,14 @@ public class TestServer {
     @Test
     public void testRegisterSuccess() throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPut put = new HttpPut("http://localhost:8080/Server_war/api/login");
+        HttpPut put = new HttpPut(loginUrl);
 
         put.setHeader("Content-type", "application/json");
         put.setHeader("Accept", "application/json");
 
-        username = getRandomString();
-        pass = getRandomString();
-
-
         String inputJson = "{\n" +
-                "  \"username\": \"" + DEFAULT_USERNAME + "\",\n" +
-                "  \"password\": \"" + DEFAULT_PASSWORD + "\"\n" +
+                "  \"username\": \"" + username + "\",\n" +
+                "  \"password\": \"" + pass + "\"\n" +
                 "}";
 
         StringEntity stringEntity = new StringEntity(inputJson);
@@ -99,6 +95,11 @@ public class TestServer {
 
         String rsp = EntityUtils.toString(response.getEntity());
         assertEquals(200, response.getStatusLine().getStatusCode());
+
+    }
+
+    @Test
+    public void canLoginNewUser(){
 
     }
 
