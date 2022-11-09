@@ -104,17 +104,17 @@ function update_dashboard() {
         }
     });
 
-    // setTimeout(update_dashboard, 1000);
+    setTimeout(update_dashboard, 1000);
 }
 
 function update_image() {
     // upload last image taken
     $.ajax({
-        url: `http://localhost:8080/Server_war/api/images`,
+        url: `http://localhost:8080/Server_war/api/image`,
         type: "GET",
         async: false,
         success: function (response) {
-            let encoding = response[0]["encode"];
+            let encoding = response;
             let image = new Image();
             image.src = `data:image/png;base64,${encoding}`;
             image.setAttribute("style", "max-height: 47vh;");
@@ -127,7 +127,7 @@ function update_image() {
         }
     });
 
-    // setTimeout(update_image, 10000);
+    setTimeout(update_image, 10000);
 }
 
 update_dashboard();
