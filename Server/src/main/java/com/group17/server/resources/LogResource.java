@@ -2,8 +2,6 @@ package com.group17.server.resources;
 
 import com.group17.JSONObjects.Log;
 import com.group17.server.database.DAO;
-import com.group17.server.database.Database;
-import com.group17.server.SecurityCheck;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;

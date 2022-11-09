@@ -22,8 +22,8 @@ class SecurityTest {
     void randomStringAlwaysRandom() {
         String[] rdStrings = new String[1000];
         for (int i = 0; i < rdStrings.length; i++) {
-            byte[] hashedPassword = Objects.requireNonNull(hashSaltFromPassword(plainPassword))[0];
-            rdStrings[i] = new String(hashedPassword);
+            String hashedPassword = Objects.requireNonNull(hashSaltFromPassword(plainPassword))[0];
+            rdStrings[i] = hashedPassword;
         }
         Assertions.assertFalse(hasDuplicate(rdStrings));
     }
@@ -35,8 +35,8 @@ class SecurityTest {
     void passwordAlwaysRandom() {
         String[] passwords = new String[1000];
         for (int i = 0; i < passwords.length; i++) {
-            byte[] hashedPassword = Objects.requireNonNull(hashSaltFromPassword(plainPassword))[0];
-            passwords[i] = new String(hashedPassword);
+            String hashedPassword = Objects.requireNonNull(hashSaltFromPassword(plainPassword))[0];
+            passwords[i] = hashedPassword;
         }
 
         Assertions.assertFalse(hasDuplicate(passwords));

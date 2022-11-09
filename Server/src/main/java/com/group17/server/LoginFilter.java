@@ -8,7 +8,7 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
-@SecurityCheck
+@TokenCheck
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class LoginFilter implements ContainerRequestFilter {
@@ -16,17 +16,17 @@ public class LoginFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
-            String authorizationHeader;
+            String authorizationCookie;
 
             try {
-                authorizationHeader = requestContext.getCookies().get("SESSION_ID").getValue();
+                authorizationCookie = requestContext.getCookies().get("SESSION_ID").getValue();
             } catch (NullPointerException e) {
                 abortWithUnauthorized(requestContext, "Token was not provided");
                 return;
             }
 
             // Validate the token
-            if (!validToken(authorizationHeader))
+            if (!validToken(authorizationCookie))
                 abortWithUnauthorized(requestContext, "Couldn't authenticate the user, please log in again");
 
     }

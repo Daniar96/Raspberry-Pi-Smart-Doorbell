@@ -25,7 +25,7 @@ public class SecurityFunctions {
         return data;
     }
 
-    public static byte[][] hashSaltFromPassword(String passwordString) {
+    public static String[] hashSaltFromPassword(String passwordString) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance(HASH_FUNCTION);
             SecureRandom srd = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, PROVIDER);
@@ -36,9 +36,9 @@ public class SecurityFunctions {
             String saltPlusPlainTextPassword = passwordString + new String(salt);
             // Hash password and salt
             messageDigest.update(saltPlusPlainTextPassword.getBytes(StandardCharsets.UTF_8));
-            byte[][] toReturn = new byte[2][];
-            toReturn[0] = messageDigest.digest();
-            toReturn[1] = salt;
+            String[] toReturn = new String[2];
+            toReturn[0] = Arrays.toString(messageDigest.digest());
+            toReturn[1] = Arrays.toString(salt);
             return toReturn;
 
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {

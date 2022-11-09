@@ -1,4 +1,5 @@
 package com.group17.server.database;
+
 public class Queries {
 
     static final String CREATE_SCHEMA = "CREATE SCHEMA IF NOT EXISTS safe_home; SET search_path = safe_home;\n";
@@ -17,6 +18,7 @@ public class Queries {
 
 
     static final String GET_USER = "SELECT to_jsonb(data) FROM (SELECT u.email, u.hashed_password, u.salt FROM safe_home.users u WHERE u.email = ?) as data;";
+    static final String GET_RPI_PASSWORD_SALT = "SELECT to_jsonb(data) FROM (SELECT hashed_password, salt FROM rpi WHERE rpi_id = ?) as data;";
     static final String GET_USER_INFO = "SELECT to_jsonb(data) FROM (SELECT u.username, u.full_name FROM safe_home.users u WHERE u.email = ?) as data;";
     static final String GET_AT_HOME_TAGS = "SELECT u.username, a.at_home FROM allowed_tags a, users u WHERE a.rpi_id = ? AND u.rfid = a.rfid;";
     static final String GET_AT_HOME_TAG = "SELECT u.username, a.at_home FROM allowed_tags a, users u WHERE a.rpi_id = ? AND u.rfid = a.rfid AND a.rfid = ?;";
@@ -30,7 +32,9 @@ public class Queries {
     static final String COUNT_AT_HOME = "SELECT COUNT (*) FROM allowed_tags WHERE is_online = TRUE AND rpi_id = ?";
 
     static final String INSERT_USER = "INSERT INTO users (hashed_password, salt, email, username, rfid) VALUES (?, ?, ?, ?, ?);";
-    static final String INSERT_IMAGE= "INSERT INTO images (rpi_id, name, encoding) VALUES (?, ?, ?);";
+    static final String INSERT_RPI = "INSERT INTO rpi (hashed_password, salt, rpi_id," +
+            " is_smoke_alert,is_mic_alert, is_flame_alert, pir_is_on) VALUES (?, ?, ?, FALSE, FALSE, FALSE, FALSE);";
+    static final String INSERT_IMAGE = "INSERT INTO images (rpi_id, name, encoding) VALUES (?, ?, ?);";
     static final String INSERT_LOG = "INSERT INTO logs (rpi_id, date, log) VALUES (?, ?, ?);";
     static final String SET_USER_INFO_PASSWORD = "UPDATE users SET hashed_password = ?, salt = ?, full_name = ?, username = ?  WHERE email = ?;";
     static final String SET_USER_INFO = "UPDATE users SET full_name = ?, username = ?  WHERE email = ?;";
@@ -41,10 +45,6 @@ public class Queries {
     static final String SET_TEMPERATURE = "UPDATE rpi SET temperature=?, humidity=? WHERE rpi_id = ?";
     static final String SET_PIR_ON = "UPDATE rpi SET pir_is_on = TRUE WHERE rpi_id = ?;";
     static final String SET_PIR_OFF = "UPDATE rpi SET pir_is_on = FALSE WHERE rpi_id = ?;";
-
-
-
-
 
 
 }

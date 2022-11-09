@@ -26,20 +26,23 @@ public class DAO {
         if (userInfo.getPassword() == null) {
             Database.update(SET_USER_INFO, userInfo.getFull_name(), userInfo.getUsername(), email);
         } else {
-            byte[][] hashWithSalt = hashSaltFromPassword(userInfo.getPassword());
+            String[] hashWithSalt = hashSaltFromPassword(userInfo.getPassword());
             assert hashWithSalt != null;
-            String[] stringArgs = new String[]{userInfo.getFull_name(), userInfo.getUsername(), email};
-            Database.update(SET_USER_INFO_PASSWORD, hashWithSalt, stringArgs);
+            Database.update(SET_USER_INFO_PASSWORD, hashWithSalt[0],hashWithSalt[1], userInfo.getFull_name(), userInfo.getUsername(), email);
         }
     }
 
-    public static void addUser(String email, byte[][] hashWithSalt, String rfid) throws SQLException {
+    public static void addUser(String email, String[] hashWithSalt, String rfid) throws SQLException {
         //Add a new user with email = email and username = email
-        Database.update(INSERT_USER, hashWithSalt, new String[]{email, email, rfid});
+        Database.update(INSERT_USER, hashWithSalt[0],hashWithSalt[1], email, email, rfid);
     }
 
     public static String getUser(String userName) throws SQLException {
         return Database.getString(GET_USER, userName);
+    }
+
+    public static String getRpiPasswordSalt(String rpi_id) throws SQLException {
+        return Database.getString(GET_RPI_PASSWORD_SALT, rpi_id);
     }
 
     public static List<Username_AtHomeStatus> getAtHomeList(String rpi_id) throws SQLException {
@@ -55,18 +58,32 @@ public class DAO {
 
     }
 
-    public static boolean registerUser(String userName, String passwordString, String rfid) throws SQLException {
+    public static boolean registerUser(String userName, String passwordPlain, String rfid) throws SQLException {
         // Check if a user is in a database
         String user = getUser(userName);
         if (user != null) {
             return false;
 
         } else {
-            byte[][] hashWithSalt = hashSaltFromPassword(passwordString);
+            String[] hashWithSalt = hashSaltFromPassword(passwordPlain);
             // Update database
             addUser(userName, hashWithSalt, rfid);
             return true;
         }
+    }
+
+    public static boolean registerRpi(String rpi_id, String passwordPlain) throws SQLException {
+        String rpi = getRpiPasswordSalt(rpi_id);
+        if (rpi != null) {
+            return false;
+
+        } else {
+            String[] hashWithSalt = hashSaltFromPassword(passwordPlain);
+            // Update database
+            Database.update(INSERT_RPI, hashWithSalt[0], hashWithSalt[1],rpi_id);
+            return true;
+        }
+
     }
 
     public static boolean checkUser(String userName, String plainPassword) throws SQLException {
@@ -192,6 +209,17 @@ public class DAO {
 
     public static boolean getPir(String rpi_id) throws SQLException {
         return Database.getBoolean(GET_PIR_STATUS, rpi_id);
+    }
+
+    public static String[] getRpi_hashedPassword_salt(String rpi_id) throws SQLException {
+        String credentialsString = getRpiPasswordSalt(rpi_id);
+        HashedUserCredentials credentials = new HashedUserCredentials(credentialsString);
+        // Get hexadecimal representation of a salt and a password
+        String saltHexStr = credentials.getSalt();
+        String hashPswrdHexStr = credentials.getHashed_password();
+
+        return new String[]{hashPswrdHexStr, saltHexStr};
+
     }
 
 }

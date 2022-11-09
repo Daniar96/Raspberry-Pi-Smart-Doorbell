@@ -2,7 +2,7 @@ package com.group17.server.resources;
 import com.group17.JSONObjects.ServerError;
 import com.group17.JSONObjects.UserInfo;
 import com.group17.server.database.DAO;
-import com.group17.server.SecurityCheck;
+import com.group17.server.TokenCheck;
 import com.group17.server.TokenList;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -17,7 +17,7 @@ public class AccountResource {
     private ContainerRequest request;
 
 
-    @SecurityCheck
+    @TokenCheck
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserInfo(){
@@ -30,7 +30,7 @@ public class AccountResource {
         }
     }
 
-    @SecurityCheck
+    @TokenCheck
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

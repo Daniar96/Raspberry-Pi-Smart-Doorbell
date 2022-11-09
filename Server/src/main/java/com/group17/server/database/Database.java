@@ -44,21 +44,6 @@ public class Database {
         }
     }
 
-    public static void update(String query, byte[][] bytesParams, String[] stringParams) throws SQLException {
-        assert connection != null;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            int index = 0;
-            for (int i = 0; i < bytesParams.length; i++) {
-                preparedStatement.setBytes(i + 1, bytesParams[i]);
-                index = i + 1;
-            }
-            for (int i = 0; i < stringParams.length; i++) {
-                preparedStatement.setString(i + (index + 1), stringParams[i]);
-            }
-            preparedStatement.executeUpdate();
-        }
-    }
-
     public static void update(String query, boolean alert, String rpi_id) throws SQLException {
         assert connection != null;
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {

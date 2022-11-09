@@ -5,11 +5,13 @@ import com.group17.server.database.DAO;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.glassfish.jersey.server.ContainerRequest;
 
 import java.sql.SQLException;
 
 @Path("/RPI")
 public class RPIresource {
+    private ContainerRequest request;
 
     @POST
     @Path("/smoke")
@@ -127,7 +129,11 @@ public class RPIresource {
     @Path("/temp")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTemp() throws SQLException {
-        return Response.status(200).entity(DAO.getTemp("101")).build();
+        return Response.status(200).entity(DAO.getTemp(getRpiID())).build();
+    }
+
+    private String getRpiID(){
+        return request.getRequestCookies().get("rf_id").getValue();
     }
 
 
