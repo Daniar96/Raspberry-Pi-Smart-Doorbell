@@ -152,6 +152,7 @@ public class RPIresource {
         return Response.status(200).entity(i).build();
     }
 
+    @TokenCheck
     @GET
     @Path("/temp")
     @Produces(MediaType.APPLICATION_JSON)

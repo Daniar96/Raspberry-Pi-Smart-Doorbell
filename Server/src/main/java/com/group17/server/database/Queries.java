@@ -22,7 +22,8 @@ public class Queries {
     static final String GET_USER_INFO = "SELECT to_jsonb(data) FROM (SELECT u.username, u.full_name FROM safe_home.users u WHERE u.email = ?) as data;";
     static final String GET_AT_HOME_TAGS = "SELECT u.username, a.at_home FROM allowed_tags a, users u WHERE a.rpi_id = ? AND u.rfid = a.rfid;";
     static final String GET_AT_HOME_TAG = "SELECT u.username, a.at_home FROM allowed_tags a, users u WHERE a.rpi_id = ? AND u.rfid = a.rfid AND a.rfid = ?;";
-    static final String GET_IMAGES = "SELECT name, encoding FROM images WHERE rpi_id = ? ORDER BY name DESC;";
+    static final String GET_IMAGES = "SELECT name, encoding FROM images WHERE rpi_id = ? ORDER BY name DESC LIMIT 3;";
+    static final String GET_IMAGE = "SELECT name, encoding FROM images WHERE rpi_id = ? ORDER BY name DESC LIMIT 1;";
     static final String GET_SMOKE_ALERT = "SELECT is_smoke_alert FROM rpi WHERE rpi_id = ?;";
     static final String GET_FLAME_ALERT = "SELECT is_flame_alert FROM rpi WHERE rpi_id = ?;";
     static final String GET_MIC_ALERT = "SELECT is_mic_alert FROM rpi WHERE rpi_id = ?;";

@@ -187,11 +187,15 @@ public class DAO {
             String encode = resultSet.getString("encoding");
             Image image = new Image(name, encode);
             images.add(image);
-            if (images.size() >= 5) {
-                return images;
-            }
         }
         return images;
+    }
+
+    public static String getImage(String rpi_id) throws SQLException {
+        ResultSet resultSet = Database.getResultSet(GET_IMAGE, rpi_id);
+        resultSet.next();
+        String encode = resultSet.getString("encoding");
+        return encode;
     }
 
     public static List<Log> getLogs(String rpi_id) throws SQLException {
