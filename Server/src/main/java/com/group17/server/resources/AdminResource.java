@@ -9,6 +9,10 @@ import jakarta.ws.rs.core.Response;
 
 import java.sql.SQLException;
 
+
+/**
+ * This class is only used for testing and must be disabled before deployment
+ */
 @Path("/admin")
 public class AdminResource {
     @Path("/hello")

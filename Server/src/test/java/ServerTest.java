@@ -12,7 +12,7 @@ import static com.group17.server.SecurityFunctions.getRandomString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class TestServer {
+public class ServerTest {
     String DEFAULT_USERNAME = "bogdan@gmail.com";
     String DEFAULT_PASSWORD = "password";
     String username;
