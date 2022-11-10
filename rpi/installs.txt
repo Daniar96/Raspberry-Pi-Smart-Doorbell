@@ -1,0 +1,4 @@
+sudo pip3 install mfrc522
+sudo pip3 install spidev
+pip install MQ2
+pip install requests

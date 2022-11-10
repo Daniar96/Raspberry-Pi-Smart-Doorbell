@@ -6,6 +6,7 @@ reader = SimpleMFRC522()
 
 try:
         id, text = reader.read()
+        print(id)
         f = open("demo.txt", "a")
         f.write(str(id) + "\n")
         f.close()
