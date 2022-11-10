@@ -114,7 +114,6 @@ function update_image() {
         type: "GET",
         async: false,
         success: function (response) {
-            console.log(response)
             let encoding = response;
             let image = new Image();
             image.src = `data:image/png;base64,${encoding}`;
@@ -128,7 +127,7 @@ function update_image() {
         }
     });
 
-    setTimeout(update_image, 10000);
+    setTimeout(update_image, 5000);
 }
 
 update_dashboard();
