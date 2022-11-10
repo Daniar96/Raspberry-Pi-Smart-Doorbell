@@ -151,6 +151,11 @@ public class RPIresource {
         }else {
             i = 0;
         }
+
+        if (DAO.arePeopleInside(getRpiIDFromUser())){
+            i = 0;
+        }
+
         return Response.status(200).entity(i).build();
     }
 
