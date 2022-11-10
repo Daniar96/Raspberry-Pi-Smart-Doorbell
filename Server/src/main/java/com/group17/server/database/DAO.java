@@ -115,16 +115,21 @@ public class DAO {
 
     }
 
-    public static boolean checkOnline(String rfid, String rpi_id) throws SQLException {
-        int switched_status = Database.update(SWITCH_AT_HOME, rfid);
-        ResultSet resultSet = Database.getResultSet(GET_AT_HOME_TAG, rfid, rpi_id);
-        resultSet.next();
-        String name = resultSet.getString("username");
-        boolean k = resultSet.getBoolean("at_home");
-        if (k) {
-            DAO.addLog("User " + name + " has entered the house.", rpi_id);
-        } else {
-            DAO.addLog("User " + name + " has left the house.", rpi_id);
+    public static boolean checkOnline(String rfid, String rpi_id) {
+        int switched_status = 0;
+        try{
+            switched_status = Database.update(SWITCH_AT_HOME, rfid);
+            ResultSet resultSet = Database.getResultSet(GET_AT_HOME_TAG, rpi_id, rfid);
+            resultSet.next();
+            String name = resultSet.getString("username");
+            boolean k = resultSet.getBoolean("at_home");
+            if (k) {
+                DAO.addLog("User " + name + " has entered the house.", rpi_id);
+            } else {
+                DAO.addLog("User " + name + " has left the house.", rpi_id);
+            }
+        }catch (SQLException e){
+
         }
         return switched_status > 0;
     }
@@ -214,7 +219,7 @@ public class DAO {
         ResultSet resultSet = Database.getResultSet(COUNT_AT_HOME, rpi_id);
         resultSet.next();
         int i = resultSet.getInt(1);
-        return i <= 0;
+        return i > 0;
     }
 
     public static void stopPir(String rpi_id) throws SQLException {
